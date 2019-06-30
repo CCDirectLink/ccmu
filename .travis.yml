@@ -1,0 +1,19 @@
+language: go
+
+go:
+  - 1.12.x
+
+install:
+  - go mod install
+
+script:
+  - go generate
+  - go test
+  - GOOS="linux" GOARCH="amd64" go build -o "ccmu"
+  - GOOS="windows" GOARCH="amd64" go build -o "ccmu.exe"
+
+deploy:
+  - provider: github
+    files:
+      - "ccmu"
+      - "ccmu.exe"
