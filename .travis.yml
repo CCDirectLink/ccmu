@@ -20,3 +20,4 @@ deploy:
     - ccmu-mac
   on:
     repo: CCDirectLink/CCUpdaterCLI
+    tags: true
