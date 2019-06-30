@@ -3,5 +3,15 @@ package main
 import "fmt"
 
 func printHelp() {
-	fmt.Println("These are the usable prefixes: ccmu <install|uninstall|update|list|outdated|help>")
+	fmt.Println("Usage: ccmu [command] [options] <args...>")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Commands:")
+	fmt.Println("")
+	fmt.Println("install <mod name>")
+	fmt.Println("uninstall <mod name>")
+	fmt.Println("update <mod name>")
+	fmt.Println("list")
+	fmt.Println("outdated")
+	fmt.Println("help")
 }
