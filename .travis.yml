@@ -2,7 +2,7 @@ language: go
 go:
 - 1.12.x
 install:
-- go mod install
+- go mod download
 script:
 - go generate
 - go test
