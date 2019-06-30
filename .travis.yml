@@ -2,6 +2,7 @@ language: go
 go:
 - 1.12.x
 install:
+- go get
 - go mod download
 script:
 - go generate
