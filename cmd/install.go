@@ -31,13 +31,28 @@ func Install(args []string) {
 			continue
 		}
 
-		if _, err := global.GetMod(name); err != nil {
-			fmt.Printf("Could find '%s'", name)
-			continue
-		}
+		installMod(name)
+	}
+}
 
-		if err := install.Install(name, false); err != nil {
-			fmt.Printf("Could not install '%s' because an error occured in %s", name, err.Error())
-		}
+func installMod(name string) {
+	if _, err := global.GetMod(name); err != nil {
+		fmt.Printf("Could find '%s'", name)
+		return
+	}
+
+	if err := install.Install(name, false); err != nil {
+		fmt.Printf("Could not install '%s' because an error occured in %s", name, err.Error())
+		return
+	}
+
+	mod, err := local.GetMod(name)
+	if err != nil {
+		fmt.Printf("Installed '%s' but it seems to be an invalid mod", name)
+		return
+	}
+
+	for name := range mod.Dependencies {
+		installMod(name)
 	}
 }
