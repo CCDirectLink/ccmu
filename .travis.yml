@@ -15,10 +15,11 @@ deploy:
   api_key:
     secure: OZf2THcnKEyoG3fv9dypvi27b75GhseeROdyJzlAGJPtUJiVE9kctmE/7xviqHYCgleUcfM2nIJ85hLOw57zH4NQwDvlYa280t81PakhqgLOmJYET/9zUDGtihoIq35/jzhLH+xtyPtoEbpsPUrf8XLLYivJGNBcF9ephtz24T4hhBY05KQ1KDS1EhqTfnNFMMuFQpBCOXQ03dMsk4cg2h1SCUF0/O14vQ2AGauD8ZNRZc8w9aJnzsxnjW3UZqmHWpujmoZbV2lEUs9IiwLNou3kKXnOx39YgU0r8ST/iTwo2uDjpajyc+ETLerhdQx/Z7qMfLNNQjBLxbK2VY/GBE1xDl5gI1JQW+ziIDWoCHuLksQrAZ77Ray9OKbA3/zTKyq/k9Nrr9r/crPdQ/VVtbfAQ/d6JUk/wXVP1lEPRHGt+E2PyXUCB9GPREvultJNvzB8coGsSrne2fGK9it2BZnTYQzp/nrJ5JUlLkjD+mUIqoMzPAgdDkss+9PRKaV4dYqQ+zrZ98sjLg6AqmaCfepKho4ibEJe6FGKmfOUUil+fkTDYvRFP82bHCDwmGQh+9oHUFkoxQtCaQ0jq1q9EDU+25xBVMjVBW85NsZfBxJAjxhgjU/Esljbe+H3NxexMmdo65wDj71Ron8llxhmfH+sXcQwBMfqnsPSIj5FMqU=
   skip_cleanup: true
+  overwrite: true
   files: 
-    - ccmu.exe
-    - ccmu
-    - ccmu-mac
+    - "ccmu.exe"
+    - "ccmu"
+    - "ccmu-mac"
   on:
     repo: CCDirectLink/CCUpdaterCLI
     tags: true
