@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
 )
 
 //Outdated displays old mods and their new version
 func Outdated() {
-	if _, err := internal.GetGame(); err != nil {
+	if _, err := local.GetGame(); err != nil {
 		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.")
 		return
 	}
 
-	mods, err := internal.GetLocalMods()
+	mods, err := local.GetMods()
 	if err != nil {
 		fmt.Printf("Could not list mods because of an error in %s\n", err.Error())
 		os.Exit(1)
@@ -23,7 +24,7 @@ func Outdated() {
 	outdated := false
 	for _, mod := range mods {
 		if out, _ := mod.Outdated(); out {
-			new, err := internal.GetGlobalMod(mod.Name)
+			new, err := global.GetMod(mod.Name)
 			if err != nil {
 				fmt.Printf("An error occured in %s\n", err.Error())
 				continue

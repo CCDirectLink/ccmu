@@ -1,4 +1,4 @@
-package internal
+package local
 
 import (
 	"encoding/json"
@@ -8,15 +8,15 @@ import (
 	"path/filepath"
 )
 
-//LocalMod contains the data of the installed mod
-type LocalMod struct {
+//Mod contains the data of the installed mod
+type Mod struct {
 	Name     string
 	BasePath string
 	Version  string
 }
 
-//GetLocalMods finds all local mods
-func GetLocalMods() ([]LocalMod, error) {
+//GetMods finds all local mods
+func GetMods() ([]Mod, error) {
 	game, err := GetGame()
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func GetLocalMods() ([]LocalMod, error) {
 
 	mods := filepath.Join(game, "assets/mods")
 	if exists, _ := exists(mods); !exists {
-		return []LocalMod{}, nil
+		return []Mod{}, nil
 	}
 
 	dirs, err := ioutil.ReadDir(mods)
@@ -32,7 +32,7 @@ func GetLocalMods() ([]LocalMod, error) {
 		return nil, err
 	}
 
-	var result []LocalMod
+	var result []Mod
 	for _, dir := range dirs {
 		if dir.IsDir() {
 			mod, err := parseMod(filepath.Join(mods, dir.Name(), "package.json"))
@@ -45,11 +45,11 @@ func GetLocalMods() ([]LocalMod, error) {
 	return result, nil
 }
 
-//GetLocalMod finds the installed mod by name
-func GetLocalMod(name string) (LocalMod, error) {
-	mods, err := GetLocalMods()
+//GetMod finds the installed mod by name
+func GetMod(name string) (Mod, error) {
+	mods, err := GetMods()
 	if err != nil {
-		return LocalMod{}, err
+		return Mod{}, err
 	}
 
 	for _, mod := range mods {
@@ -58,13 +58,13 @@ func GetLocalMod(name string) (LocalMod, error) {
 		}
 	}
 
-	return LocalMod{}, fmt.Errorf("cmd/internal: Could not find mod '%s'", name)
+	return Mod{}, fmt.Errorf("cmd/internal: Could not find mod '%s'", name)
 }
 
-func parseMod(path string) (LocalMod, error) {
+func parseMod(path string) (Mod, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return LocalMod{}, nil
+		return Mod{}, nil
 	}
 	defer file.Close()
 
@@ -74,7 +74,7 @@ func parseMod(path string) (LocalMod, error) {
 	}
 	err = json.NewDecoder(file).Decode(&data)
 	if err != nil {
-		return LocalMod{}, nil
+		return Mod{}, nil
 	}
 
 	var version string
@@ -84,7 +84,7 @@ func parseMod(path string) (LocalMod, error) {
 		version = "0.0.0"
 	}
 
-	return LocalMod{
+	return Mod{
 		data.Name,
 		filepath.Dir(path),
 		version,

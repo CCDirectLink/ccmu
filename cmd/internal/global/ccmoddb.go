@@ -1,4 +1,4 @@
-package internal
+package global
 
 import (
 	"encoding/json"
@@ -50,8 +50,8 @@ func FetchModData() (*CCModDb, error) {
 	return data, err
 }
 
-//GetGlobalMod returns the ccmoddb mod by name
-func GetGlobalMod(name string) (Mod, error) {
+//GetMod returns the ccmoddb mod by name
+func GetMod(name string) (Mod, error) {
 	_, err := FetchModData()
 	if err != nil {
 		return Mod{}, err
