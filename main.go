@@ -30,6 +30,8 @@ func main() {
 		cmd.List()
 	case "outdated":
 		cmd.Outdated()
+	case "version":
+		printVersion()
 	case "help":
 		printHelp()
 	default:
