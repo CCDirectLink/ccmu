@@ -1,19 +1,29 @@
 package internal
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
-//GetGame using the current working directory
+//GetGame using the current working directory or flags
 func GetGame() (string, error) {
-	dir, err := os.Getwd()
+	dir, err := getDir()
 	if err != nil {
 		return "", err
 	}
 	return searchForGame(dir)
+}
+
+func getDir() (string, error) {
+	game := flag.Lookup("game")
+	if game != nil {
+		return game.Value.String(), nil
+	}
+
+	return os.Getwd()
 }
 
 func searchForGame(dir string) (string, error) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -8,13 +9,16 @@ import (
 )
 
 func main() {
+	flag.String("game", "", "if set it overrides the path of the game")
+	flag.Parse()
+
 	if len(os.Args) == 1 {
 		printHelp()
 		return
 	}
 
-	op := os.Args[1]
-	args := os.Args[2:]
+	op := flag.Arg(0)
+	args := flag.Args()[1:]
 
 	switch op {
 	case "install",
