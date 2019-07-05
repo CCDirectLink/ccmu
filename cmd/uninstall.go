@@ -9,6 +9,11 @@ import (
 
 //Uninstall removes a mod from a directory
 func Uninstall(args []string) {
+	if _, err := internal.GetGame(); err != nil {
+		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.")
+		return
+	}
+
 	for _, name := range args {
 		mod, err := internal.GetLocalMod(name)
 		if err != nil {

@@ -17,7 +17,7 @@ type LocalMod struct {
 
 //GetLocalMods finds all local mods
 func GetLocalMods() ([]LocalMod, error) {
-	game, err := findGame()
+	game, err := GetGame()
 	if err != nil {
 		return nil, err
 	}

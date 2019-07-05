@@ -167,7 +167,7 @@ func findPackage(dir string) (string, bool, error) {
 }
 
 func getModFolderName(name string, override bool) (string, error) {
-	path, err := findGame()
+	path, err := GetGame()
 	if err != nil {
 		return path, err
 	}

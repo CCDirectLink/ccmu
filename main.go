@@ -33,7 +33,7 @@ func main() {
 	case "help":
 		printHelp()
 	default:
-		fmt.Printf("%s\n is not a command, please use one of the following.", op)
+		fmt.Printf("%s\n is not a command", op)
 		printHelp()
 		os.Exit(1)
 	}
