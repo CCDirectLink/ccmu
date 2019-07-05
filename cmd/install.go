@@ -22,7 +22,7 @@ func Install(args []string) {
 	for _, name := range args {
 		err := internal.Install(name, false)
 		if err != nil {
-			fmt.Printf("Could install '%s' because an error occured in %s", name, err.Error())
+			fmt.Printf("Could not install '%s' because an error occured in %s", name, err.Error())
 		}
 	}
 }

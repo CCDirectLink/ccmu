@@ -22,7 +22,7 @@ func Update(args []string) {
 	for _, name := range args {
 		err := internal.Install(name, true)
 		if err != nil {
-			fmt.Printf("Could update '%s' because an error occured in %s", name, err.Error())
+			fmt.Printf("Could not update '%s' because an error occured in %s", name, err.Error())
 		}
 	}
 }
