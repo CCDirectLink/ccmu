@@ -10,9 +10,10 @@ import (
 
 //Mod contains the data of the installed mod
 type Mod struct {
-	Name     string
-	BasePath string
-	Version  string
+	Name         string
+	BasePath     string
+	Version      string
+	Dependencies map[string]string
 }
 
 //GetMods finds all local mods
@@ -69,8 +70,10 @@ func parseMod(path string) (Mod, error) {
 	defer file.Close()
 
 	var data struct {
-		Name    string  `json:"name"`
-		Version *string `json:"version"`
+		Name              string             `json:"name"`
+		Version           *string            `json:"version"`
+		Dependencies      *map[string]string `json:"dependencies"`
+		CcmodDependencies *map[string]string `json:"ccmodDependencies"`
 	}
 	err = json.NewDecoder(file).Decode(&data)
 	if err != nil {
@@ -84,9 +87,17 @@ func parseMod(path string) (Mod, error) {
 		version = "0.0.0"
 	}
 
+	var dependencies map[string]string
+	if data.CcmodDependencies != nil {
+		dependencies = *data.CcmodDependencies
+	} else if data.Dependencies != nil {
+		dependencies = *data.Dependencies
+	}
+
 	return Mod{
 		data.Name,
 		filepath.Dir(path),
 		version,
+		dependencies,
 	}, nil
 }
