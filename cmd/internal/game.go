@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 )
 
-func findGame() (string, error) {
+//GetGame using the current working directory
+func GetGame() (string, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		return "", err

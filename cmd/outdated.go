@@ -9,6 +9,11 @@ import (
 
 //Outdated displays old mods and their new version
 func Outdated() {
+	if _, err := internal.GetGame(); err != nil {
+		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.")
+		return
+	}
+
 	mods, err := internal.GetLocalMods()
 	if err != nil {
 		fmt.Printf("Could not list mods because of an error in %s\n", err.Error())
