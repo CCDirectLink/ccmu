@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal"
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/install"
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
 )
 
@@ -37,7 +37,7 @@ func Update(args []string) {
 			continue
 		}
 
-		err := internal.Install(name, true)
+		err := install.Install(name, true)
 		if err != nil {
 			fmt.Printf("Could not update '%s' because an error occured in %s", name, err.Error())
 		}
