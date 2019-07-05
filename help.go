@@ -5,6 +5,9 @@ import "fmt"
 func printHelp() {
 	fmt.Println("Usage: ccmu [command] [options] <args...>")
 	fmt.Println("")
+	fmt.Println("Options:")
+	fmt.Println("  --game <path>         Sets the game folder used for operations")
+	fmt.Println("")
 	fmt.Println("Commands:")
 	fmt.Println("  install <mod name>    Installs one or more mods")
 	fmt.Println("  uninstall <mod name>  Uninstall one or more mods")
