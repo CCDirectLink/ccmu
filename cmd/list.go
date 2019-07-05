@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
 )
 
 //List prints a list of all available mods
 func List() {
-	data, err := internal.FetchModData()
+	data, err := global.FetchModData()
 	if err != nil {
 		fmt.Printf("Could not list mods because of an error in %s\n", err.Error())
 		os.Exit(1)

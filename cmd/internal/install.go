@@ -10,11 +10,14 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
 )
 
 //Install a mod
 func Install(name string, override bool) error {
-	mod, err := GetGlobalMod(name)
+	mod, err := global.GetMod(name)
 	if err != nil {
 		return err
 	}
@@ -167,7 +170,7 @@ func findPackage(dir string) (string, bool, error) {
 }
 
 func getModFolderName(name string, override bool) (string, error) {
-	path, err := GetGame()
+	path, err := local.GetGame()
 	if err != nil {
 		return path, err
 	}
