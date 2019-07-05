@@ -11,7 +11,7 @@ import (
 //Outdated displays old mods and their new version
 func Outdated() {
 	if _, err := local.GetGame(); err != nil {
-		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.")
+		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.\n")
 		return
 	}
 
