@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/api"
 )
 
 func main() {
@@ -34,6 +35,8 @@ func main() {
 		cmd.List()
 	case "outdated":
 		cmd.Outdated()
+	case "api":
+		api.Start()
 	case "version":
 		printVersion()
 	case "help":
