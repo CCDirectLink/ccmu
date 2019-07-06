@@ -17,5 +17,6 @@ func Start() {
 	fmt.Printf("API server listening on %s\n", url)
 
 	http.HandleFunc("/api/v1/install", api.Install)
+	http.HandleFunc("/api/v1/uninstall", api.Uninstall)
 	http.ListenAndServe(url, nil)
 }
