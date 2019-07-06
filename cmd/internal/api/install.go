@@ -47,17 +47,17 @@ func Install(w http.ResponseWriter, r *http.Request) {
 func install(decoder *json.Decoder) error {
 	var req InstallRequest
 	if err := decoder.Decode(&req); err != nil {
-		return err
+		return fmt.Errorf("cmd/internal/api: Could not parse request body: %s", err.Error())
 	}
 
 	if req.Game != nil {
 		if err := flag.Set("game", *req.Game); err != nil {
-			return err
+			return fmt.Errorf("cmd/internal/api: Could set game flag: %s", err.Error())
 		}
 	}
 
 	if result := cmd.Install(req.Names); !result {
-		return fmt.Errorf("Could not install mods")
+		return fmt.Errorf("cmd/internal/api: Could not install mods")
 	}
 
 	return nil
