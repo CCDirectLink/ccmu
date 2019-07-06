@@ -16,5 +16,6 @@ func Start() {
 	url := fmt.Sprintf(":%d", port)
 	fmt.Printf("API server listening on %s\n", url)
 
+	http.HandleFunc("/api/v1/install", api.Install)
 	http.ListenAndServe(url, nil)
 }

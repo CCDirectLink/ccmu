@@ -11,20 +11,20 @@ import (
 var installed = 0
 
 //Install a mod
-func Install(args []string) {
+func Install(args []string) bool {
 	if len(args) == 0 {
 		fmt.Println("No mods installed since no mods were specified")
-		return
+		return false
 	}
 
 	if _, err := local.GetGame(); err != nil {
 		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.\n")
-		return
+		return false
 	}
 
 	if _, err := global.FetchModData(); err != nil {
 		fmt.Printf("Could not download mod data because an error occured in %s\n", err.Error())
-		return
+		return false
 	}
 
 	for _, name := range args {
@@ -37,6 +37,7 @@ func Install(args []string) {
 	}
 
 	fmt.Printf("Installed %d mods\n", installed)
+	return installed > 0
 }
 
 func installMod(name string) {
