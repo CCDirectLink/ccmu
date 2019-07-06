@@ -15,8 +15,8 @@ type InstallRequest struct {
 	Names []string `json:"names"`
 }
 
-//InstallRespose for installation requests
-type InstallRespose struct {
+//InstallResponse for installation requests
+type InstallResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message,omitempty"`
 }
@@ -33,11 +33,11 @@ func Install(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 	if err == nil {
-		encoder.Encode(&InstallRespose{
+		encoder.Encode(&InstallResponse{
 			Success: true,
 		})
 	} else {
-		encoder.Encode(&InstallRespose{
+		encoder.Encode(&InstallResponse{
 			Success: false,
 			Message: err.Error(),
 		})
