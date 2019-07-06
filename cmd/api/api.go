@@ -19,6 +19,6 @@ func Start() {
 	http.HandleFunc("/api/v1/install", api.Install)
 	http.HandleFunc("/api/v1/uninstall", api.Uninstall)
 	http.HandleFunc("/api/v1/update", api.Update)
-	http.HandleFunc("/api/v1/get/local", api.Update)
+	http.HandleFunc("/api/v1/get/local", api.GetLocalMods)
 	http.ListenAndServe(url, nil)
 }
