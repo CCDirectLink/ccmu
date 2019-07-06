@@ -9,21 +9,21 @@ import (
 )
 
 //Update a mod
-func Update(args []string) {
+func Update(args []string) bool {
 	if len(args) == 0 {
 		fmt.Println("No mods updated since no mods were specified")
-		return
+		return false
 	}
 
 	if _, err := local.GetGame(); err != nil {
 		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.\n")
-		return
+		return false
 	}
 
 	_, err := global.FetchModData()
 	if err != nil {
 		fmt.Printf("Could not download mod data because an error occured in %s\n", err.Error())
-		return
+		return false
 	}
 
 	count := 0
@@ -47,4 +47,5 @@ func Update(args []string) {
 	}
 
 	fmt.Printf("Updated %d mods\n", count)
+	return count > 0
 }
