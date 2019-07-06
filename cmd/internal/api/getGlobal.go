@@ -9,7 +9,7 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
 )
 
-//GlobalModsRequest for incoming installation requests
+//GlobalModsRequest for incoming list available mods requests
 type GlobalModsRequest struct {
 	Game *string `json:"game"`
 }
