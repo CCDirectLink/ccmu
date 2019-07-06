@@ -14,6 +14,7 @@ func Uninstall(args []string) {
 		return
 	}
 
+	count := 0
 	for _, name := range args {
 		mod, err := local.GetMod(name)
 		if err != nil {
@@ -25,5 +26,8 @@ func Uninstall(args []string) {
 		if err != nil {
 			fmt.Printf("Could not remove mod '%s' because of an error in %s\n", name, err.Error())
 		}
+
+		count++
 	}
+	fmt.Printf("Uninstalled %d mods", count)
 }

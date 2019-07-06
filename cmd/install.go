@@ -8,6 +8,8 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
 )
 
+var installed = 0
+
 //Install a mod
 func Install(args []string) {
 	if len(args) == 0 {
@@ -32,9 +34,9 @@ func Install(args []string) {
 		}
 
 		installMod(name)
-
-		fmt.Printf("Installed '%s'\n", name)
 	}
+
+	fmt.Printf("Installed %d mods\n", installed)
 }
 
 func installMod(name string) {
@@ -53,6 +55,8 @@ func installMod(name string) {
 		fmt.Printf("Installed '%s' but it seems to be an invalid mod\n", name)
 		return
 	}
+
+	installed++
 
 	for name := range mod.Dependencies {
 		installMod(name)
