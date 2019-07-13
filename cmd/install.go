@@ -11,54 +11,51 @@ import (
 var installed = 0
 
 //Install a mod
-func Install(args []string) {
+func Install(args []string) (*Stats, error) {
 	if len(args) == 0 {
-		fmt.Println("No mods installed since no mods were specified")
-		return
+		return nil, fmt.Errorf("cmd: No mods installed since no mods were specified")
 	}
 
 	if _, err := local.GetGame(); err != nil {
-		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.\n")
-		return
+		return nil, fmt.Errorf("cmd: Could not find game folder")
 	}
 
 	if _, err := global.FetchModData(); err != nil {
-		fmt.Printf("Could not download mod data because an error occured in %s\n", err.Error())
-		return
+		return nil, fmt.Errorf("cmd: Could not download mod data because an error occured in %s", err.Error())
 	}
+
+	stats := &Stats{}
 
 	for _, name := range args {
 		if _, err := local.GetMod(name); err == nil {
-			fmt.Printf("Could not install '%s' because it was already installed\n", name)
+			stats.AddWarning(fmt.Sprintf("cmd: Could not install '%s' because it was already installed", name))
 			continue
 		}
 
-		installMod(name)
+		if err := installMod(name, stats); err != nil {
+			return stats, err
+		}
 	}
 
-	fmt.Printf("Installed %d mods\n", installed)
+	return stats, nil
 }
 
-func installMod(name string) {
+func installMod(name string, stats *Stats) error {
 	if _, err := global.GetMod(name); err != nil {
-		fmt.Printf("Could find mod '%s'\n", name)
-		return
+		stats.AddWarning(fmt.Sprintf("cmd: Could find mod '%s'", name))
+		return nil
 	}
 
 	if err := install.Install(name, false); err != nil {
-		fmt.Printf("Could not install '%s' because an error occured in %s\n", name, err.Error())
-		return
+		return fmt.Errorf("cmd: Could not install '%s' because an error occured in %s", name, err.Error())
 	}
 
 	mod, err := local.GetMod(name)
 	if err != nil {
-		fmt.Printf("Installed '%s' but it seems to be an invalid mod\n", name)
-		return
+		stats.AddWarning(fmt.Sprintf("cmd: Installed '%s' but it seems to be an invalid mod", name))
+		return nil
 	}
 
-	installed++
-
-	for name := range mod.Dependencies {
-		installMod(name)
-	}
+	stats.Installed++
+	return installDependencies(mod, stats)
 }

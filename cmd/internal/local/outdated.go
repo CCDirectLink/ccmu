@@ -2,7 +2,7 @@ package local
 
 import (
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
-	"github.com/coreos/go-semver/semver"
+	"github.com/Masterminds/semver"
 )
 
 //Outdated checks if an newer version is available
@@ -12,7 +12,14 @@ func (mod *Mod) Outdated() (bool, error) {
 		return false, err
 	}
 
-	newest := semver.New(db.Version)
-	current := semver.New(mod.Version)
-	return current.LessThan(*newest), nil
+	newest, err := semver.NewVersion(db.Version)
+	if err != nil {
+		return false, err
+	}
+	current, err := semver.NewVersion(mod.Version)
+	if err != nil {
+		return false, err
+	}
+
+	return current.LessThan(newest), nil
 }

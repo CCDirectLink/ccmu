@@ -9,42 +9,52 @@ import (
 )
 
 //Update a mod
-func Update(args []string) {
+func Update(args []string) (*Stats, error) {
 	if len(args) == 0 {
-		fmt.Println("No mods updated since no mods were specified")
-		return
+		return nil, fmt.Errorf("cmd: No mods updated since no mods were specified")
 	}
 
 	if _, err := local.GetGame(); err != nil {
-		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.\n")
-		return
+		return nil, fmt.Errorf("cmd: Could not find game folder")
 	}
 
 	_, err := global.FetchModData()
 	if err != nil {
-		fmt.Printf("Could not download mod data because an error occured in %s\n", err.Error())
-		return
+		return nil, fmt.Errorf("cmd: Could not download mod data because an error occured in %s", err.Error())
 	}
 
-	count := 0
+	stats := &Stats{}
 	for _, name := range args {
-		if _, err := local.GetMod(name); err != nil {
-			fmt.Printf("Could not update '%s' because it was not installed\n", name)
-			continue
+		if err := updateMod(name, stats); err != nil {
+			return stats, err
 		}
-
-		if _, err := global.GetMod(name); err != nil {
-			fmt.Printf("Could find '%s'\n", name)
-			continue
-		}
-
-		err := install.Install(name, true)
-		if err != nil {
-			fmt.Printf("Could not update '%s' because an error occured in %s\n", name, err.Error())
-		}
-
-		count++
 	}
 
-	fmt.Printf("Updated %d mods\n", count)
+	return stats, nil
+}
+
+func updateMod(name string, stats *Stats) error {
+	if _, err := local.GetMod(name); err != nil {
+		stats.AddWarning(fmt.Sprintf("cmd: Could not update '%s' because it was not installed", name))
+		return nil
+	}
+
+	if _, err := global.GetMod(name); err != nil {
+		stats.AddWarning(fmt.Sprintf("cmd: Could find '%s'", name))
+		return nil
+	}
+
+	if err := install.Install(name, true); err != nil {
+		return fmt.Errorf("cmd: Could not update '%s' because an error occured in %s", name, err.Error())
+	}
+
+	stats.Updated++
+
+	mod, err := local.GetMod(name)
+	if err != nil {
+		stats.AddWarning(fmt.Sprintf("cmd: Updated '%s' but it seems to be an invalid mod", name))
+		return nil
+	}
+
+	return installDependencies(mod, stats)
 }
