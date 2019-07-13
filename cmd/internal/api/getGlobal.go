@@ -28,6 +28,8 @@ func GetGlobalMods(w http.ResponseWriter, r *http.Request) {
 		decoder = json.NewDecoder(r.Body)
 	}
 
+	w.Header().Add("Content-Type", "application/json")
+
 	mods, err := getGlobalMods(decoder)
 
 	encoder := json.NewEncoder(w)

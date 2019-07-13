@@ -29,6 +29,8 @@ func Uninstall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Add("Content-Type", "application/json")
+
 	decoder := json.NewDecoder(r.Body)
 	stats, err := uninstall(decoder)
 
