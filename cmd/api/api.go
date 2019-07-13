@@ -1,7 +1,6 @@
 package api
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 
@@ -10,10 +9,12 @@ import (
 
 //Start api server
 func Start() {
-	var port int
-	flag.IntVar(&port, "port", 9392, "the port which the api server listens on")
+	StartAt("localhost", 9392)
+}
 
-	url := fmt.Sprintf(":%d", port)
+//StartAt host and port
+func StartAt(host string, port int) {
+	url := fmt.Sprintf("%s:%d", host, port)
 	fmt.Printf("API server listening on %s\n", url)
 
 	http.HandleFunc("/api/v1/install", api.Install)

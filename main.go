@@ -11,6 +11,10 @@ import (
 
 func main() {
 	flag.String("game", "", "if set it overrides the path of the game")
+
+	port := flag.Int("port", 9392, "the port which the api server listens on")
+	host := flag.String("host", "", "the host which the api server listens on")
+
 	flag.Parse()
 
 	if len(os.Args) == 1 {
@@ -36,7 +40,7 @@ func main() {
 	case "outdated":
 		cmd.Outdated()
 	case "api":
-		api.Start()
+		api.StartAt(*host, *port)
 	case "version":
 		printVersion()
 	case "help":
