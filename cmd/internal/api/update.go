@@ -17,8 +17,9 @@ type UpdateRequest struct {
 
 //UpdateResponse for update requests
 type UpdateResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message,omitempty"`
+	Success bool      `json:"success"`
+	Message string    `json:"message,omitempty"`
+	Stats   cmd.Stats `json:"stats,omitempty"`
 }
 
 //Update a mod via api request
@@ -29,12 +30,13 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	err := update(decoder)
+	stats, err := update(decoder)
 
 	encoder := json.NewEncoder(w)
 	if err == nil {
 		encoder.Encode(&UpdateResponse{
 			Success: true,
+			Stats:   *stats,
 		})
 	} else {
 		encoder.Encode(&UpdateResponse{
@@ -44,21 +46,17 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func update(decoder *json.Decoder) error {
+func update(decoder *json.Decoder) (*cmd.Stats, error) {
 	var req UpdateRequest
 	if err := decoder.Decode(&req); err != nil {
-		return fmt.Errorf("cmd/internal/api: Could not parse request body: %s", err.Error())
+		return nil, fmt.Errorf("cmd/internal/api: Could not parse request body: %s", err.Error())
 	}
 
 	if req.Game != nil {
 		if err := flag.Set("game", *req.Game); err != nil {
-			return fmt.Errorf("cmd/internal/api: Could set game flag: %s", err.Error())
+			return nil, fmt.Errorf("cmd/internal/api: Could set game flag: %s", err.Error())
 		}
 	}
 
-	if result := cmd.Update(req.Names); !result {
-		return fmt.Errorf("cmd/internal/api: Could not update mods")
-	}
-
-	return nil
+	return cmd.Update(req.Names)
 }

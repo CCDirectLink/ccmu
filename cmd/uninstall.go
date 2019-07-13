@@ -8,27 +8,26 @@ import (
 )
 
 //Uninstall removes a mod from a directory
-func Uninstall(args []string) bool {
+func Uninstall(args []string) (*Stats, error) {
 	if _, err := local.GetGame(); err != nil {
-		fmt.Printf("Could not find game folder. Make sure you executed the command inside the game folder.\n")
-		return false
+		return nil, fmt.Errorf("cmd: Could not find game folder")
 	}
 
-	count := 0
+	stats := &Stats{}
 	for _, name := range args {
 		mod, err := local.GetMod(name)
 		if err != nil {
-			fmt.Printf("Could not find mod '%s'\n", name)
+			stats.AddWarning(fmt.Sprintf("cmd: Could not find mod '%s'", name))
 			continue
 		}
 
 		err = os.RemoveAll(mod.BasePath)
 		if err != nil {
-			fmt.Printf("Could not remove mod '%s' because of an error in %s\n", name, err.Error())
+			stats.AddWarning(fmt.Sprintf("cmd: Could not remove mod '%s' because of an error in %s", name, err.Error()))
 		}
 
-		count++
+		stats.Removed++
 	}
-	fmt.Printf("Uninstalled %d mods", count)
-	return count > 0
+
+	return stats, nil
 }

@@ -24,13 +24,13 @@ func main() {
 	switch op {
 	case "install",
 		"i":
-		cmd.Install(args)
+		printStatsAndError(cmd.Install(args))
 	case "remove",
 		"delete",
 		"uninstall":
-		cmd.Uninstall(args)
+		printStatsAndError(cmd.Uninstall(args))
 	case "update":
-		cmd.Update(args)
+		printStatsAndError(cmd.Update(args))
 	case "list":
 		cmd.List()
 	case "outdated":
@@ -45,5 +45,21 @@ func main() {
 		fmt.Printf("%s\n is not a command", op)
 		printHelp()
 		os.Exit(1)
+	}
+}
+
+func printStatsAndError(stats *cmd.Stats, err error) {
+	if stats != nil && stats.Warnings != nil {
+		for _, warning := range stats.Warnings {
+			fmt.Printf("Warning in %s\n", warning)
+		}
+	}
+
+	if err != nil {
+		fmt.Printf("ERROR in %s\n", err.Error())
+	}
+
+	if stats != nil {
+		fmt.Printf("Installed %d, updated %d, removed %d\n", stats.Installed, stats.Updated, stats.Removed)
 	}
 }

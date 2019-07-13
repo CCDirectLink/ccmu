@@ -17,8 +17,9 @@ type InstallRequest struct {
 
 //InstallResponse for installation requests
 type InstallResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message,omitempty"`
+	Success bool      `json:"success"`
+	Message string    `json:"message,omitempty"`
+	Stats   cmd.Stats `json:"stats,omitempty"`
 }
 
 //Install a mod via api request
@@ -29,12 +30,13 @@ func Install(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	err := install(decoder)
+	stats, err := install(decoder)
 
 	encoder := json.NewEncoder(w)
 	if err == nil {
 		encoder.Encode(&InstallResponse{
 			Success: true,
+			Stats:   *stats,
 		})
 	} else {
 		encoder.Encode(&InstallResponse{
@@ -44,21 +46,17 @@ func Install(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func install(decoder *json.Decoder) error {
+func install(decoder *json.Decoder) (*cmd.Stats, error) {
 	var req InstallRequest
 	if err := decoder.Decode(&req); err != nil {
-		return fmt.Errorf("cmd/internal/api: Could not parse request body: %s", err.Error())
+		return nil, fmt.Errorf("cmd/internal/api: Could not parse request body: %s", err.Error())
 	}
 
 	if req.Game != nil {
 		if err := flag.Set("game", *req.Game); err != nil {
-			return fmt.Errorf("cmd/internal/api: Could set game flag: %s", err.Error())
+			return nil, fmt.Errorf("cmd/internal/api: Could set game flag: %s", err.Error())
 		}
 	}
 
-	if result := cmd.Install(req.Names); !result {
-		return fmt.Errorf("cmd/internal/api: Could not install mods")
-	}
-
-	return nil
+	return cmd.Install(req.Names)
 }
