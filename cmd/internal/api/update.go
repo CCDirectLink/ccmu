@@ -17,9 +17,9 @@ type UpdateRequest struct {
 
 //UpdateResponse for update requests
 type UpdateResponse struct {
-	Success bool      `json:"success"`
-	Message string    `json:"message,omitempty"`
-	Stats   cmd.Stats `json:"stats,omitempty"`
+	Success bool       `json:"success"`
+	Message string     `json:"message,omitempty"`
+	Stats   *cmd.Stats `json:"stats,omitempty"`
 }
 
 //Update a mod via api request
@@ -38,12 +38,13 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		encoder.Encode(&UpdateResponse{
 			Success: true,
-			Stats:   *stats,
+			Stats:   stats,
 		})
 	} else {
 		encoder.Encode(&UpdateResponse{
 			Success: false,
 			Message: err.Error(),
+			Stats:   stats,
 		})
 	}
 }

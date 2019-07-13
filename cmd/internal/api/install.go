@@ -17,9 +17,9 @@ type InstallRequest struct {
 
 //InstallResponse for installation requests
 type InstallResponse struct {
-	Success bool      `json:"success"`
-	Message string    `json:"message,omitempty"`
-	Stats   cmd.Stats `json:"stats,omitempty"`
+	Success bool       `json:"success"`
+	Message string     `json:"message,omitempty"`
+	Stats   *cmd.Stats `json:"stats,omitempty"`
 }
 
 //Install a mod via api request
@@ -38,12 +38,13 @@ func Install(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		encoder.Encode(&InstallResponse{
 			Success: true,
-			Stats:   *stats,
+			Stats:   stats,
 		})
 	} else {
 		encoder.Encode(&InstallResponse{
 			Success: false,
 			Message: err.Error(),
+			Stats:   stats,
 		})
 	}
 }

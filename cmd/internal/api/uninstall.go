@@ -17,9 +17,9 @@ type UninstallRequest struct {
 
 //UninstallResponse for uninstallation requests
 type UninstallResponse struct {
-	Success bool      `json:"success"`
-	Message string    `json:"message,omitempty"`
-	Stats   cmd.Stats `json:"stats,omitempty"`
+	Success bool       `json:"success"`
+	Message string     `json:"message,omitempty"`
+	Stats   *cmd.Stats `json:"stats,omitempty"`
 }
 
 //Uninstall a mod via api request
@@ -38,12 +38,13 @@ func Uninstall(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		encoder.Encode(&UninstallResponse{
 			Success: true,
-			Stats:   *stats,
+			Stats:   stats,
 		})
 	} else {
 		encoder.Encode(&UninstallResponse{
 			Success: false,
 			Message: err.Error(),
+			Stats:   stats,
 		})
 	}
 }
