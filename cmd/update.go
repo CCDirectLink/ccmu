@@ -10,10 +10,6 @@ import (
 
 //Update a mod
 func Update(args []string) (*Stats, error) {
-	if len(args) == 0 {
-		return nil, fmt.Errorf("cmd: No mods updated since no mods were specified")
-	}
-
 	if _, err := local.GetGame(); err != nil {
 		return nil, fmt.Errorf("cmd: Could not find game folder")
 	}
@@ -23,9 +19,43 @@ func Update(args []string) (*Stats, error) {
 		return nil, fmt.Errorf("cmd: Could not download mod data because an error occured in %s", err.Error())
 	}
 
+	if len(args) == 0 {
+		return updateOutdated()
+	}
+
 	stats := &Stats{}
 	for _, name := range args {
 		if err := updateMod(name, stats); err != nil {
+			return stats, err
+		}
+	}
+
+	return stats, nil
+}
+
+func updateOutdated() (*Stats, error) {
+	mods, err := local.GetMods()
+	if err != nil {
+		return nil, fmt.Errorf("cmd: Could not list installed mods because and error occured in %s", err.Error())
+	}
+
+	stats := &Stats{}
+	for _, mod := range mods {
+		if _, err := global.GetMod(mod.Name); err != nil {
+			stats.AddWarning(fmt.Sprintf("cmd: Could not get mod info for '%s'", mod.Name))
+			continue
+		}
+
+		outdated, err := mod.Outdated()
+		if err != nil {
+			return stats, fmt.Errorf("cmd: Could not check if the mod was outdated because an error occured in %s", err.Error())
+		}
+
+		if !outdated {
+			continue
+		}
+
+		if err := updateMod(mod.Name, stats); err != nil {
 			return stats, err
 		}
 	}
