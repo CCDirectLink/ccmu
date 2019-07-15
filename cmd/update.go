@@ -42,7 +42,6 @@ func updateOutdated() (*Stats, error) {
 	stats := &Stats{}
 	for _, mod := range mods {
 		if _, err := global.GetMod(mod.Name); err != nil {
-			stats.AddWarning(fmt.Sprintf("cmd: Could not get mod info for '%s'", mod.Name))
 			continue
 		}
 
