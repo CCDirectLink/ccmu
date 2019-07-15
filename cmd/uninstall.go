@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/tools"
 )
 
 //Uninstall removes a mod from a directory
@@ -17,7 +18,10 @@ func Uninstall(args []string) (*Stats, error) {
 	for _, name := range args {
 		mod, err := local.GetMod(name)
 		if err != nil {
-			stats.AddWarning(fmt.Sprintf("cmd: Could not find mod '%s'", name))
+			err = uninstallTool(name, stats)
+			if err != nil {
+				return stats, err
+			}
 			continue
 		}
 
@@ -30,4 +34,20 @@ func Uninstall(args []string) (*Stats, error) {
 	}
 
 	return stats, nil
+}
+
+func uninstallTool(name string, stats *Stats) error {
+	tool := tools.Find(name)
+	if tool == nil {
+		stats.AddWarning(fmt.Sprintf("cmd: Could not find mod or tool '%s'", name))
+		return nil
+	}
+
+	err := tool.Uninstall()
+	if err != nil {
+		return err
+	}
+
+	stats.Removed++
+	return nil
 }

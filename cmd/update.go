@@ -6,6 +6,7 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/install"
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/tools"
 )
 
 //Update a mod
@@ -64,8 +65,7 @@ func updateOutdated() (*Stats, error) {
 
 func updateMod(name string, stats *Stats) error {
 	if _, err := local.GetMod(name); err != nil {
-		stats.AddWarning(fmt.Sprintf("cmd: Could not update '%s' because it was not installed", name))
-		return nil
+		return updateTool(name, stats)
 	}
 
 	if _, err := global.GetMod(name); err != nil {
@@ -86,4 +86,20 @@ func updateMod(name string, stats *Stats) error {
 	}
 
 	return installDependencies(mod, stats)
+}
+
+func updateTool(name string, stats *Stats) error {
+	tool := tools.Find(name)
+	if tool == nil {
+		stats.AddWarning(fmt.Sprintf("cmd: Could not update '%s' because it was not installed", name))
+		return nil
+	}
+
+	err := tool.Update()
+	if err != nil {
+		return err
+	}
+
+	stats.Updated++
+	return nil
 }
