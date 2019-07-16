@@ -6,6 +6,7 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/install"
 	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/local"
+	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/tools"
 )
 
 var installed = 0
@@ -42,8 +43,7 @@ func Install(args []string) (*Stats, error) {
 
 func installMod(name string, stats *Stats) error {
 	if _, err := global.GetMod(name); err != nil {
-		stats.AddWarning(fmt.Sprintf("cmd: Could find mod '%s'", name))
-		return nil
+		return installTool(name, stats)
 	}
 
 	if err := install.Install(name, false); err != nil {
@@ -58,4 +58,20 @@ func installMod(name string, stats *Stats) error {
 
 	stats.Installed++
 	return installDependencies(mod, stats)
+}
+
+func installTool(name string, stats *Stats) error {
+	tool := tools.Find(name)
+	if tool == nil {
+		stats.AddWarning(fmt.Sprintf("cmd: Could find mod or tool '%s'", name))
+		return nil
+	}
+
+	err := tool.Install()
+	if err != nil {
+		return err
+	}
+
+	stats.Installed++
+	return nil
 }

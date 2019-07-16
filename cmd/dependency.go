@@ -26,8 +26,7 @@ func installDependency(name, version string, stats *Stats) error {
 
 	newest, err := global.GetMod(name)
 	if err != nil {
-		stats.AddWarning(fmt.Sprintf("cmd: Could find mod '%s'", name))
-		return nil
+		return installTool(name, stats)
 	}
 
 	newestVer, err := semver.NewVersion(newest.Version)
