@@ -19,6 +19,10 @@ func Find(name string) Tool {
 	switch name {
 	case "ccloader":
 		return &ccloader{}
+	case "Simplify":
+		return &simplify{}
+	case "crosscode":
+		return &crosscode{}
 	default:
 		return nil
 	}
