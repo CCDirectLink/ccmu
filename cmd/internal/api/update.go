@@ -29,7 +29,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Add("Content-Type", "application/json")
+	setHeaders(w)
 
 	decoder := json.NewDecoder(r.Body)
 	stats, err := update(decoder)
