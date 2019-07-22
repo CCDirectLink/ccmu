@@ -37,7 +37,7 @@ func Outdated(w http.ResponseWriter, r *http.Request) {
 		decoder = json.NewDecoder(r.Body)
 	}
 
-	w.Header().Add("Content-Type", "application/json")
+	setHeaders(w)
 
 	mods, err := outdated(decoder)
 
