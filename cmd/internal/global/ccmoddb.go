@@ -17,7 +17,7 @@ type CCModDb struct {
 type Mod struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
-	Licence     *string `josn:"licence"`
+	License     *string `josn:"license"`
 	Page        []struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
