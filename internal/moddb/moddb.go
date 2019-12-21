@@ -40,9 +40,9 @@ func ModInfos() ([]pkg.Info, error) {
 
 	result := make([]pkg.Info, len(data.Mods))
 	i := 0
-	for _, mod := range data.Mods {
+	for name, mod := range data.Mods {
 		result[i] = pkg.Info{
-			Name:          mod.Name,
+			Name:          name,
 			NiceName:      mod.Name,
 			Description:   mod.Description,
 			Licence:       mod.Licence,
@@ -84,7 +84,8 @@ func modInfos() (Mods, error) {
 		return mods, nil
 	}
 
-	mods, err := getMods()
+	var err error
+	mods, err = getMods()
 	if err != nil {
 		return mods, err
 	}

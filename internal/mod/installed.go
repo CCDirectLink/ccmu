@@ -9,5 +9,5 @@ import (
 func (m Mod) Installed() bool {
 	path := filepath.Join(m.path(), "package.json")
 	_, err := os.Stat(path)
-	return err != nil
+	return err == nil
 }
