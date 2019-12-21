@@ -1,5 +1,6 @@
 package ccmu
 
+/*
 import (
 	"encoding/json"
 	"fmt"
@@ -101,3 +102,4 @@ func parseMod(path string) (Mod, error) {
 		dependencies,
 	}, nil
 }
+*/
