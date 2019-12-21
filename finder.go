@@ -1,4 +1,4 @@
-package local
+package ccmu
 
 import (
 	"flag"
@@ -8,8 +8,7 @@ import (
 	"path/filepath"
 )
 
-//GetGame using the current working directory or flags
-func GetGame() (string, error) {
+func getGame() (string, error) {
 	dir, err := getDir()
 	if err != nil {
 		return "", err

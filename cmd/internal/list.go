@@ -1,21 +1,20 @@
-package cmd
+package internal
 
 import (
 	"fmt"
 	"os"
-
-	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal/global"
 )
 
 //List prints a list of all available mods
 func List() {
-	data, err := global.FetchModData()
+	pkgs, err := getGame().Available()
 	if err != nil {
 		fmt.Printf("Could not list mods because of an error in %s\n", err.Error())
 		os.Exit(1)
 	}
 
-	for _, mod := range data.Mods {
-		fmt.Printf("%s %s\n", mod.Version, mod.Name)
+	for _, pkg := range pkgs {
+		info, err := pkg.Info()
+		fmt.Printf("%s %s %s\n", info.NewestVersion, info.NiceName, err)
 	}
 }

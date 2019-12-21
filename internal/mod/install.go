@@ -1,27 +1,39 @@
-package install
+package mod
 
 import (
 	"archive/zip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
+	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
 )
 
-func extract(file *os.File) (string, error) {
-	dir, err := ioutil.TempDir("installing", "mod")
-	if err != nil {
-		return "", err
+//Install the mod
+func (m Mod) Install() error {
+	if (m.Installed()) {
+		return pkg.NewErrorReason(pkg.ReasonAlreadyInstalled, pkg.ModeInstall, m, nil)
 	}
 
-	reader, err := zip.OpenReader(file.Name())
+	reader, size, err := moddb.DownloadMod(m.Name)
 	if err != nil {
-		return "", err
+		return pkg.NewError(pkg.ModeInstall, m, err)
 	}
 	defer reader.Close()
 
+	zipReader, err := zip.NewReader(newBufferedReaderAt(reader), size)
+	if err != nil {
+		return pkg.NewError(pkg.ModeInstall, m, err)
+	}
+
+	_, err = extract(zipReader, m.path())
+	return pkg.NewError(pkg.ModeInstall, m, err)
+}
+
+func extract(reader *zip.Reader, dir string) (string, error) {
 	for _, file := range reader.File {
 		// Store filename/path for returning and using later on
 		fpath := filepath.Join(dir, file.Name)
@@ -38,7 +50,7 @@ func extract(file *os.File) (string, error) {
 		}
 
 		// Make File
-		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
 			return dir, err
 		}
 

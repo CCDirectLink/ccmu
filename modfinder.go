@@ -1,4 +1,4 @@
-package local
+package ccmu
 
 import (
 	"encoding/json"
@@ -18,7 +18,7 @@ type Mod struct {
 
 //GetMods finds all local mods
 func GetMods() ([]Mod, error) {
-	game, err := GetGame()
+	game, err := getGame()
 	if err != nil {
 		return nil, err
 	}
