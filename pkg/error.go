@@ -24,7 +24,8 @@ type Mode int
 
 //Modes of operations
 const (
-	ModeInstall Mode = iota
+	ModeUnknown Mode = iota
+	ModeInstall
 	ModeUninstall
 	ModeUpdate
 )
