@@ -51,5 +51,16 @@ func (g Game) Available() ([]pkg.Package, error) {
 
 //Get mod by name.
 func (g Game) Get(name string) (pkg.Package, error) {
-	return nil, nil
+	path, err := g.path()
+
+	result := mod.Mod {
+		Name: name,
+		Path: path,
+		Game: &g,
+	}
+	
+	if err != nil {
+		return result, pkg.NewError(pkg.ModeUnknown, result, err)
+	}
+	return result, nil
 }
