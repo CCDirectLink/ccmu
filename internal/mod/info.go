@@ -8,11 +8,11 @@ import (
 //Info about the mod.
 func (m Mod) Info() (pkg.Info, error) {
 	if !m.Installed() {
-		return moddb.ModInfo(m.Name)
+		return moddb.PkgInfo(m.Name)
 	}
 
 	info := m.localInfo()
-	err := moddb.MergeModInfo(&info)
+	err := moddb.MergePkgInfo(&info)
 	return info, err
 }
 

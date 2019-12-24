@@ -9,53 +9,73 @@ import (
 )
 
 var (
-	mods           Mods
-	modsDownloaded bool
+	pkgs           PackageDB
+	pkgsDownloaded bool
+
+	infos       map[string]pkg.Info
+	infosParsed bool
 
 	//ErrNotFound is returned when the given mod is not found.
 	ErrNotFound = errors.New("moddb: Mod not found")
 )
 
-//ModInfo reads a given pkg.Info from the moddb.
-func ModInfo(name string) (pkg.Info, error) {
-	data, err := modInfo(name)
-	if err != nil {
-		return pkg.Info{}, err
-	}
-	return pkg.Info{
-		Name:          name,
-		NiceName:      data.Name,
-		Description:   data.Description,
-		Licence:       data.Licence,
-		NewestVersion: data.Version,
-	}, nil
-}
-
-//ModInfos reads all pkg.Infos from the moddb.
-func ModInfos() ([]pkg.Info, error) {
-	data, err := modInfos()
-	if err != nil {
-		return nil, err
-	}
-
-	result := make([]pkg.Info, len(data.Mods))
-	i := 0
-	for name, mod := range data.Mods {
-		result[i] = pkg.Info{
-			Name:          name,
-			NiceName:      mod.Name,
-			Description:   mod.Description,
-			Licence:       mod.Licence,
-			NewestVersion: mod.Version,
+//PkgInfo reads a given pkg.Info from the moddb.
+func PkgInfo(name string) (pkg.Info, error) {
+	if !infosParsed {
+		_, err := PkgInfos()
+		if err != nil {
+			return pkg.Info{Name: name}, err
 		}
-		i++
+	}
+
+	result, ok := infos[name]
+	if !ok {
+		return result, ErrNotFound
 	}
 	return result, nil
 }
 
-//MergeModInfo with old one.
-func MergeModInfo(info *pkg.Info) error {
-	newInfo, err := ModInfo(info.Name)
+//PkgInfos reads all pkg.Infos from the moddb.
+func PkgInfos() ([]pkg.Info, error) {
+	if infosParsed {
+		result := make([]pkg.Info, len(infos))
+		i := 0
+		for _, info := range infos {
+			result[i] = info
+			i++
+		}
+		return result, nil
+	}
+
+	db, err := packageDB()
+	if err != nil {
+		return nil, err
+	}
+
+	cache := make(map[string]pkg.Info)
+	result := make([]pkg.Info, len(db))
+	i := 0
+	for name, p := range db {
+		result[i] = pkg.Info{
+			Name:          p.Metadata.Name,
+			NiceName:      p.Metadata.niceName(),
+			Description:   p.Metadata.Description,
+			Licence:       p.Metadata.Licence,
+			NewestVersion: string(p.Metadata.Version),
+		}
+		cache[name] = result[i]
+		i++
+	}
+
+	infos = cache
+	infosParsed = true
+
+	return result, nil
+}
+
+//MergePkgInfo with old one.
+func MergePkgInfo(info *pkg.Info) error {
+	newInfo, err := PkgInfo(info.Name)
 	if err != nil {
 		return err
 	}
@@ -70,39 +90,45 @@ func MergeModInfo(info *pkg.Info) error {
 
 //DownloadMod as io.ReadCloser.
 func DownloadMod(name string) (io.ReadCloser, int64, error) {
-	data, err := modInfo(name)
+	p, err := packageByName(name)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	resp, err := http.Get(data.ArchiveLink)
+	//TODO: iterate over installation method
+	data, err := modZip(p.Installation[0])
+	if err != nil {
+		return nil, 0, err
+	}
+
+	resp, err := http.Get(data.URL)
 	return resp.Body, resp.ContentLength, err
 }
 
-func modInfos() (Mods, error) {
-	if modsDownloaded {
-		return mods, nil
+func packageDB() (PackageDB, error) {
+	if pkgsDownloaded {
+		return pkgs, nil
 	}
 
 	var err error
-	mods, err = getMods()
+	pkgs, err = getPackageDB()
 	if err != nil {
-		return mods, err
+		return pkgs, err
 	}
 
-	modsDownloaded = true
-	return mods, nil
+	pkgsDownloaded = true
+	return pkgs, nil
 }
 
-func modInfo(name string) (Mod, error) {
-	mods, err := modInfos()
+func packageByName(name string) (PackageDBPackage, error) {
+	pkgDB, err := packageDB()
 	if err != nil {
-		return Mod{}, err
+		return PackageDBPackage{}, err
 	}
 
-	mod, ok := mods.Mods[name]
+	pkg, ok := pkgDB[name]
 	if !ok {
-		return mod, ErrNotFound
+		return pkg, ErrNotFound
 	}
-	return mod, nil
+	return pkg, nil
 }

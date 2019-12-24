@@ -33,7 +33,7 @@ func (g Game) Installed() ([]pkg.Package, error) {
 
 //Available mods.
 func (g Game) Available() ([]pkg.Package, error) {
-	infos, err := moddb.ModInfos()
+	infos, err := moddb.PkgInfos()
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +53,12 @@ func (g Game) Available() ([]pkg.Package, error) {
 func (g Game) Get(name string) (pkg.Package, error) {
 	path, err := g.path()
 
-	result := mod.Mod {
+	result := mod.Mod{
 		Name: name,
 		Path: path,
 		Game: &g,
 	}
-	
+
 	if err != nil {
 		return result, pkg.NewError(pkg.ModeUnknown, result, err)
 	}
