@@ -24,6 +24,8 @@ func main() {
 	case "install",
 		"i":
 		internal.Install(args)
+	case "installed":
+		internal.Installed()
 	case "remove",
 		"delete",
 		"uninstall":

@@ -28,7 +28,17 @@ func (g Game) path() (string, error) {
 
 //Installed mods.
 func (g Game) Installed() ([]pkg.Package, error) {
-	return nil, nil
+	raw, err := mod.GetMods(g.Path, &g)
+
+	result := make([]pkg.Package, len(raw))
+	for i, mod := range raw {
+		result[i] = mod
+	}
+
+	if err != nil {
+		return result, pkg.NewError(pkg.ModeUnknown, nil, err)
+	}
+	return result, nil
 }
 
 //Available mods.
@@ -42,6 +52,7 @@ func (g Game) Available() ([]pkg.Package, error) {
 	for i, info := range infos {
 		result[i] = mod.Mod{
 			Name: info.Name,
+			Path: g.Path,
 			Game: &g,
 		}
 	}

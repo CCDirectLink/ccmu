@@ -4,6 +4,7 @@ package pkg
 type Package interface {
 	Info() (Info, error)
 	Installed() bool
+	Available() bool
 
 	Install() error
 	Uninstall() error

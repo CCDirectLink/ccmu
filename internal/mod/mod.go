@@ -16,8 +16,20 @@ type Mod struct {
 	Name string
 	Path string
 	Game game
+
+	realPath string
 }
 
 func (m Mod) path() string {
-	return filepath.Join(m.Path, "assets", "mods", m.Name)
+	if m.realPath != "" {
+		return m.realPath
+	}
+
+	if !m.Installed() {
+		m.realPath = filepath.Join(m.Path, "assets", "mods", m.Name)
+		return m.realPath
+	}
+
+	path, _ := getMod(m.Name, m.Path, m.Game)
+	return path
 }

@@ -12,7 +12,11 @@ func (m Mod) Info() (pkg.Info, error) {
 	}
 
 	info := m.localInfo()
-	err := moddb.MergePkgInfo(&info)
+
+	var err error
+	if m.Available() {
+		err = moddb.MergePkgInfo(&info)
+	}
 	return info, err
 }
 
