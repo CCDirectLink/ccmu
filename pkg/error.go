@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/Masterminds/semver"
 	"net/http"
 	"os"
 )
@@ -39,6 +41,8 @@ type Error struct {
 	Err    error
 }
 
+//TODO: Add `Cause Package`
+
 //NewError with given mode and package.
 func NewError(mode Mode, pkg Package, err error) Error {
 	var reason = ReasonUnknown
@@ -49,6 +53,8 @@ func NewError(mode Mode, pkg Package, err error) Error {
 		reason = ReasonInvalidFormat
 	} else if _, ok := err.(*os.PathError); ok {
 		reason = ReasonAccess
+	} else if errors.Is(err, semver.ErrInvalidMetadata) || errors.Is(err, semver.ErrInvalidPrerelease) || errors.Is(err, semver.ErrInvalidSemVer) {
+		reason = ReasonInvalidFormat
 	}
 
 	return Error{reason, mode, pkg, err}
@@ -79,6 +85,8 @@ func (p Error) String() string {
 		return prefix + "it was already installed"
 	case ReasonAccess:
 		return prefix + "the access was denied"
+	case ReasonInvalidFormat:
+		return prefix + "the mod was malformated"
 	case ReasonUnknown:
 		fallthrough
 	default:

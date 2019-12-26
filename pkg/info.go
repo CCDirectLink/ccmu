@@ -16,12 +16,12 @@ type Info struct {
 func (info Info) Outdated() (bool, error) {
 	newest, err := semver.NewVersion(info.NewestVersion)
 	if err != nil {
-		return false, err
+		return false, NewError(ModeUnknown, nil, err)
 	}
 
 	current, err := semver.NewVersion(info.CurrentVersion)
 	if err != nil {
-		return false, err
+		return false, NewError(ModeUnknown, nil, err)
 	}
 
 	return current.LessThan(newest), nil

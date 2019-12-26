@@ -4,6 +4,7 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/mod"
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"strings"
 )
 
 //Game represents a game instance at a given path.
@@ -78,4 +79,62 @@ func (g Game) Get(name string) (pkg.Package, error) {
 		return result, pkg.NewError(pkg.ModeUnknown, result, err)
 	}
 	return result, nil
+}
+
+//Find matching mods with (part of) the given name.
+func (g Game) Find(name string) []pkg.Package {
+	avail, _ := g.Available()
+	inst, _ := g.Installed()
+
+	exact := findExact(name, avail, inst)
+	if exact != nil {
+		return []pkg.Package{exact}
+	}
+
+	return findAll(name, avail, inst)
+}
+
+func findExact(name string, avail, inst []pkg.Package) pkg.Package {
+	name = strings.ToLower(name)
+	for _, pkg := range avail {
+		info, _ := pkg.Info()
+		if strings.ToLower(info.Name) == name || strings.ToLower(info.NiceName) == name {
+			return pkg
+		}
+	}
+	for _, pkg := range inst {
+		info, _ := pkg.Info()
+		if strings.ToLower(info.Name) == name || strings.ToLower(info.NiceName) == name {
+			return pkg
+		}
+	}
+	return nil
+}
+
+func findAll(name string, avail, inst []pkg.Package) []pkg.Package {
+	name = strings.ToLower(name)
+	result := make([]pkg.Package, 0, len(avail)+len(inst))
+	for _, pkg := range avail {
+		info, _ := pkg.Info()
+		if strings.Contains(strings.ToLower(info.Name), name) || strings.Contains(strings.ToLower(info.NiceName), name) {
+			result = append(result, pkg)
+		}
+	}
+	for _, pkg := range inst {
+		info, _ := pkg.Info()
+		if strings.Contains(strings.ToLower(info.Name), name) || strings.Contains(strings.ToLower(info.NiceName), name) {
+			new := true
+			for _, available := range avail {
+				availInfo, _ := available.Info()
+				if availInfo.Name == info.Name {
+					new = false
+					break
+				}
+			}
+			if new {
+				result = append(result, pkg)
+			}
+		}
+	}
+	return result
 }
