@@ -8,6 +8,13 @@ import (
 //Info about the mod.
 func (m Mod) Info() (pkg.Info, error) {
 	if !m.Installed() {
+		if !m.Available() {
+			return pkg.Info{
+				Name: m.Name,
+				NiceName: m.Name,
+			}, moddb.ErrNotFound
+		}
+
 		return moddb.PkgInfo(m.Name)
 	}
 

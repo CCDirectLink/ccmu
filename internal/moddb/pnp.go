@@ -98,24 +98,24 @@ type PackageDBHash struct {
 var ErrWrongInstallationMethod = errors.New("moddb: Wrong installation method")
 
 //PackageDBInstallationMethod represents a method of installing the package.
-type PackageDBInstallationMethod interface{}
+type PackageDBInstallationMethod struct {
+	PackageDBInstallationMethodCommon
+	PackageDBInstallationMethodModZip
+}
 
 //common struct to all installation methods.
-func common(m PackageDBInstallationMethod) (PackageDBInstallationMethodCommon, error) {
-	result, ok := m.(PackageDBInstallationMethodCommon)
-	if !ok {
-		return result, ErrWrongInstallationMethod
-	}
-	return result, nil
+func (m PackageDBInstallationMethod) common() PackageDBInstallationMethodCommon {
+	return m.PackageDBInstallationMethodCommon
 }
 
 //modZip struct. Returns error if type is wrong.
-func modZip(m PackageDBInstallationMethod) (PackageDBInstallationMethodModZip, error) {
-	result, ok := m.(PackageDBInstallationMethodModZip)
-	if !ok || result.Type != PackageDBInstallationMethodTypeModZip {
-		return result, ErrWrongInstallationMethod
+func (m PackageDBInstallationMethod) modZip() (PackageDBInstallationMethodModZip, error) {
+	common := m.common()
+	m.PackageDBInstallationMethodModZip.PackageDBInstallationMethodCommon = common
+	if common.Type != PackageDBInstallationMethodTypeModZip {
+		return m.PackageDBInstallationMethodModZip, ErrWrongInstallationMethod
 	}
-	return result, nil
+	return m.PackageDBInstallationMethodModZip, nil
 }
 
 //PackageDBInstallationMethodType represents the possible types of a PackageDBInstallationMethod

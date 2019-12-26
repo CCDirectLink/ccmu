@@ -17,6 +17,7 @@ const (
 	ReasonNoInternet
 	ReasonAlreadyInstalled
 	ReasonInvalidFormat
+	ReasonNotFound
 )
 
 //Mode of the installation.
@@ -69,10 +70,14 @@ func (p Error) String() string {
 	info, _ := p.Pkg.Info()
 
 	switch p.Reason {
+	case ReasonNotFound:
+		return fmt.Sprintf("Could not %s %s because it was not found", p.Mode, info.NiceName)
+	case ReasonAlreadyInstalled:
+		return fmt.Sprintf("Could not %s %s because it was already installed", p.Mode, info.NiceName)
 	case ReasonUnknown:
 		fallthrough
 	default:
-		return fmt.Sprintf("Could not " + p.Mode.String() + " " + info.NiceName + " because an unknown error occured")
+		return fmt.Sprintf("Could not %s %s because an unknown error occured in %s", p.Mode, info.NiceName, p.Err)
 	}
 }
 

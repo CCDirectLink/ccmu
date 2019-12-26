@@ -2,6 +2,7 @@ package moddb
 
 import (
 	"errors"
+	"bytes"
 	"io"
 	"net/http"
 
@@ -89,20 +90,27 @@ func MergePkgInfo(info *pkg.Info) error {
 }
 
 //DownloadMod as io.ReadCloser.
-func DownloadMod(name string) (io.ReadCloser, int64, error) {
+func DownloadMod(name string) (bytes.Buffer, string, error) {
 	p, err := packageByName(name)
 	if err != nil {
-		return nil, 0, err
+		return bytes.Buffer{}, "", err
 	}
 
 	//TODO: iterate over installation method
-	data, err := modZip(p.Installation[0])
+	data, err := p.Installation[0].modZip()
 	if err != nil {
-		return nil, 0, err
+		return bytes.Buffer{}, "", err
 	}
 
 	resp, err := http.Get(data.URL)
-	return resp.Body, resp.ContentLength, err
+	if err != nil {
+		return bytes.Buffer{}, "", err
+	}
+	defer resp.Body.Close()
+
+	var result bytes.Buffer
+	_, err = io.Copy(&result, resp.Body)
+	return result, data.Source, err
 }
 
 func packageDB() (PackageDB, error) {

@@ -2,6 +2,7 @@ package mod
 
 import (
 	"archive/zip"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -18,29 +19,40 @@ func (m Mod) Install() error {
 		return pkg.NewErrorReason(pkg.ReasonAlreadyInstalled, pkg.ModeInstall, m, nil)
 	}
 
-	reader, size, err := moddb.DownloadMod(m.Name)
-	if err != nil {
-		return pkg.NewError(pkg.ModeInstall, m, err)
+	if (!m.Available()) {
+		return pkg.NewErrorReason(pkg.ReasonNotFound, pkg.ModeInstall, m, nil)
 	}
-	defer reader.Close()
 
-	zipReader, err := zip.NewReader(newBufferedReaderAt(reader), size)
+	buf, src, err := moddb.DownloadMod(m.Name)
 	if err != nil {
 		return pkg.NewError(pkg.ModeInstall, m, err)
 	}
 
-	_, err = extract(zipReader, m.path())
-	return pkg.NewError(pkg.ModeInstall, m, err)
+	zipReader, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	if err != nil {
+		return pkg.NewError(pkg.ModeInstall, m, err)
+	}
+
+	_, err = extract(zipReader, m.path(), src)
+	if err != nil {
+		return pkg.NewError(pkg.ModeInstall, m, err)
+	}
+
+	return nil
 }
 
-func extract(reader *zip.Reader, dir string) (string, error) {
+func extract(reader *zip.Reader, dst, src string) (string, error) {
 	for _, file := range reader.File {
+		if len(file.Name) < len(src) || file.Name[:len(src)] != src {
+			continue
+		}
+
 		// Store filename/path for returning and using later on
-		fpath := filepath.Join(dir, file.Name)
+		fpath := filepath.Join(dst, file.Name[len(src):])
 
 		// Check for ZipSlip. More Info: http://bit.ly/2MsjAWE
-		if !strings.HasPrefix(fpath, filepath.Clean(dir)+string(os.PathSeparator)) {
-			return dir, fmt.Errorf("%s: illegal file path", fpath)
+		if !strings.HasPrefix(fpath, filepath.Clean(dst)+string(os.PathSeparator)) && (fpath != filepath.Clean(dst) || !file.FileInfo().IsDir()) {
+			return dst, fmt.Errorf("%s: illegal file path", fpath)
 		}
 
 		if file.FileInfo().IsDir() {
@@ -51,17 +63,17 @@ func extract(reader *zip.Reader, dir string) (string, error) {
 
 		// Make File
 		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
-			return dir, err
+			return dst, err
 		}
 
 		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
-			return dir, err
+			return dst, err
 		}
 
 		tmpFile, err := file.Open()
 		if err != nil {
-			return dir, err
+			return dst, err
 		}
 
 		_, err = io.Copy(outFile, tmpFile)
@@ -71,8 +83,8 @@ func extract(reader *zip.Reader, dir string) (string, error) {
 		tmpFile.Close()
 
 		if err != nil {
-			return dir, err
+			return dst, err
 		}
 	}
-	return dir, nil
+	return dst, nil
 }
