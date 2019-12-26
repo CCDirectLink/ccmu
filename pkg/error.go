@@ -1,12 +1,11 @@
 package pkg
 
-import "fmt"
-
-import "net/http"
-
-import "errors"
-
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+)
 
 //ErrorReason that is included in Error.
 type ErrorReason int
@@ -18,6 +17,7 @@ const (
 	ReasonAlreadyInstalled
 	ReasonInvalidFormat
 	ReasonNotFound
+	ReasonAccess
 )
 
 //Mode of the installation.
@@ -43,10 +43,12 @@ type Error struct {
 func NewError(mode Mode, pkg Package, err error) Error {
 	var reason = ReasonUnknown
 
-	if errors.Is(err, &http.ProtocolError{}) {
+	if _, ok := err.(*http.ProtocolError); ok {
 		reason = ReasonNoInternet
-	} else if errors.Is(err, &json.SyntaxError{}) {
+	} else if _, ok := err.(*json.SyntaxError); ok {
 		reason = ReasonInvalidFormat
+	} else if _, ok := err.(*os.PathError); ok {
+		reason = ReasonAccess
 	}
 
 	return Error{reason, mode, pkg, err}
@@ -68,16 +70,19 @@ func (p Error) Unwrap() error {
 
 func (p Error) String() string {
 	info, _ := p.Pkg.Info()
+	prefix := fmt.Sprintf("Could not %s %s because ", p.Mode, info.NiceName)
 
 	switch p.Reason {
 	case ReasonNotFound:
-		return fmt.Sprintf("Could not %s %s because it was not found", p.Mode, info.NiceName)
+		return prefix + "it was not found"
 	case ReasonAlreadyInstalled:
-		return fmt.Sprintf("Could not %s %s because it was already installed", p.Mode, info.NiceName)
+		return prefix + "it was already installed"
+	case ReasonAccess:
+		return prefix + "the access was denied"
 	case ReasonUnknown:
 		fallthrough
 	default:
-		return fmt.Sprintf("Could not %s %s because an unknown error occured in %s", p.Mode, info.NiceName, p.Err)
+		return prefix + fmt.Sprintf("an unknown error occured in %s", p.Err)
 	}
 }
 

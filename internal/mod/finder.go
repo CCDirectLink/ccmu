@@ -37,13 +37,13 @@ func GetMods(path string, game game) ([]Mod, error) {
 	return result, nil
 }
 
-func getMod(name string, path string, game game) (string, error) {
-	mods := filepath.Join(path, "assets", "mods")
+func (m Mod) local() (string, error) {
+	mods := filepath.Join(m.Path, "assets", "mods")
 	if exists, _ := exists(mods); !exists {
 		return "", moddb.ErrNotFound
 	}
 
-	unknown := filepath.Join(mods, name)
+	unknown := filepath.Join(mods, m.Name)
 
 	dirs, err := ioutil.ReadDir(mods)
 	if err != nil {
@@ -54,8 +54,8 @@ func getMod(name string, path string, game game) (string, error) {
 		if dir.IsDir() {
 			result := filepath.Join(mods, dir.Name())
 
-			mod, err := parseMod(filepath.Join(result, "package.json"), path, game)
-			if mod.Name == name {
+			mod, err := parseMod(filepath.Join(result, "package.json"), m.Path, m.Game)
+			if mod.Name == m.Name {
 				return result, err
 			}
 		}

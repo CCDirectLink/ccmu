@@ -30,6 +30,6 @@ func (m Mod) path() string {
 		return m.realPath
 	}
 
-	path, _ := getMod(m.Name, m.Path, m.Game)
+	path, _ := m.local()
 	return path
 }
