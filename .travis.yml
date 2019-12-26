@@ -7,9 +7,9 @@ install:
 script:
 - go generate
 - go test
-- GOOS="linux" GOARCH="amd64" go build -o "ccmu"
-- GOOS="windows" GOARCH="amd64" go build -o "ccmu.exe"
-- GOOS="darwin" GOARCH="amd64" go build -o "ccmu-mac"
+- GOOS="linux" GOARCH="amd64" go build ./cmd -o "ccmu"
+- GOOS="windows" GOARCH="amd64" go build ./cmd -o "ccmu.exe"
+- GOOS="darwin" GOARCH="amd64" go build ./cmd -o "ccmu-mac"
 deploy:
   provider: releases
   api_key:
