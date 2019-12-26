@@ -48,13 +48,17 @@ func (g Game) Available() ([]pkg.Package, error) {
 		return nil, err
 	}
 
-	result := make([]pkg.Package, len(infos))
-	for i, info := range infos {
-		result[i] = mod.Mod{
+	result := make([]pkg.Package, 0, len(infos))
+	for _, info := range infos {
+		if info.NiceName == "CCLoader" {
+			continue
+		}
+
+		result = append(result, mod.Mod{
 			Name: info.Name,
 			Path: g.Path,
 			Game: &g,
-		}
+		})
 	}
 
 	return result, nil
