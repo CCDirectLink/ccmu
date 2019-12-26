@@ -28,6 +28,7 @@ func (m Mod) readPackageFile() (Package, error) {
 	if err != nil {
 		return Package{}, nil
 	}
+	defer file.Close()
 
 	return readPackage(file)
 }

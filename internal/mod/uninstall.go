@@ -1,8 +1,10 @@
 package mod
 
-import "os"
+import (
+	"os"
 
-import "github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+)
 
 //Uninstall the mod.
 func (m Mod) Uninstall() error {
