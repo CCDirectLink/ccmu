@@ -9,7 +9,14 @@ import (
 
 //Update a mod
 func Update(args []string) {
-	for _, p := range getAll(args) {
+	var all []pkg.Package
+	if len(args) == 0 {
+		all, _ = getGame().Installed()
+	} else {
+		all = getAll(args)
+	}
+
+	for _, p := range all {
 		err := p.Update()
 		if err != nil {
 			var pkgErr pkg.Error
