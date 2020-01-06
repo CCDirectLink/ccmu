@@ -11,6 +11,31 @@ import (
 
 var errInvalidName = errors.New("mod: Invalid mod name")
 
+//GetMods finds all local mods
+func GetMods(path string, game game) ([]Mod, error) {
+	mods := filepath.Join(path, "assets/mods")
+	if exists, _ := exists(mods); !exists {
+		return []Mod{}, nil
+	}
+
+	dirs, err := ioutil.ReadDir(mods)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []Mod
+	for _, dir := range dirs {
+		if dir.IsDir() {
+			mod, err := parseMod(filepath.Join(mods, dir.Name(), "package.json"), path, game)
+			if err == nil && mod.Name != "" {
+				result = append(result, mod)
+			}
+		}
+	}
+
+	return result, nil
+}
+
 func (m Mod) local() (string, error) {
 	mods := filepath.Join(m.Path, "assets", "mods")
 	if exists, _ := exists(mods); !exists {
