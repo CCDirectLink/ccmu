@@ -3,6 +3,7 @@ package mod
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -15,12 +16,27 @@ import (
 
 //Install the mod
 func (m Mod) Install() error {
-	if (m.Installed()) {
+	if m.Installed() {
 		return pkg.NewErrorReason(pkg.ReasonAlreadyInstalled, pkg.ModeInstall, m, nil)
 	}
 
-	if (!m.Available()) {
+	if !m.Available() {
 		return pkg.NewErrorReason(pkg.ReasonNotFound, pkg.ModeInstall, m, nil)
+	}
+
+	deps, err := m.directDeps()
+	if err != nil {
+		return pkg.NewError(pkg.ModeInstall, m, err)
+	}
+
+	for _, dep := range deps {
+		err = dep.Install()
+		var pkgErr pkg.Error
+		if errors.As(err, &pkgErr) && pkgErr.Reason != pkg.ReasonAlreadyInstalled {
+			return err
+		} else if err != nil {
+			return err
+		}
 	}
 
 	buf, src, err := moddb.DownloadMod(m.Name)
