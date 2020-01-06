@@ -171,14 +171,15 @@ func (c ccloader) Uninstall() error {
 		return pkg.NewError(pkg.ModeUninstall, c, err)
 	}
 
+	var result error
 	err = os.RemoveAll(filepath.Join(base, "ccloader"))
 	if err != nil {
-		return pkg.NewError(pkg.ModeUninstall, c, err)
+		result = pkg.NewError(pkg.ModeUninstall, c, err)
 	}
 
-	file, err := os.Open(filepath.Join(base, "package.json"))
+	file, err := os.Create(filepath.Join(base, "package.json"))
 	if err != nil {
-		return pkg.NewError(pkg.ModeUninstall, c, err)
+		result = pkg.NewError(pkg.ModeUninstall, c, err)
 	}
 	defer file.Close()
 
@@ -200,7 +201,7 @@ func (c ccloader) Uninstall() error {
 		return pkg.NewError(pkg.ModeUninstall, c, err)
 	}
 
-	return nil
+	return result
 }
 
 func (c ccloader) Update() error {
