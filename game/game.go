@@ -80,6 +80,8 @@ func (g Game) Get(name string) (pkg.Package, error) {
 	switch strings.ToLower(name) {
 	case "ccloader":
 		return tool.Get(g, "ccloader")
+	case "crosscode":
+		return tool.Get(g, "crosscode")
 	}
 
 	path, err := g.BasePath()

@@ -19,6 +19,7 @@ const (
 	ReasonAlreadyInstalled
 	ReasonInvalidFormat
 	ReasonNotFound
+	ReasonNotAvailable
 	ReasonAccess
 	ReasonDependant
 )
@@ -83,6 +84,8 @@ func (p Error) String() string {
 	switch p.Reason {
 	case ReasonNotFound:
 		return prefix + "it was not found"
+	case ReasonNotAvailable:
+		return prefix + "it was not available"
 	case ReasonAlreadyInstalled:
 		return prefix + "it was already installed"
 	case ReasonAccess:
