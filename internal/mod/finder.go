@@ -1,7 +1,6 @@
 package mod
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -71,10 +70,7 @@ func parseMod(path, gamePath string, game game) (Mod, error) {
 	}
 	defer file.Close()
 
-	var data struct {
-		Name string `json:"name"`
-	}
-	err = json.NewDecoder(file).Decode(&data)
+	data, err := readPackage(file)
 	if err != nil {
 		return Mod{}, err
 	}
