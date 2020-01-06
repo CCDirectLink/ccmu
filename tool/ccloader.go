@@ -7,24 +7,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/game"
+	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/mod"
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
 )
 
 type ccloader struct {
-	path string
+	game game.Game
 }
 
 func (c ccloader) Info() (pkg.Info, error) {
 	info, errOnline := moddb.PkgInfo("ccloader")
-	path, err := c.base()
+	path, err := c.game.BasePath()
 	if err != nil {
 		return info, pkg.NewError(pkg.ModeUnknown, c, err)
 	}
@@ -94,7 +93,7 @@ func (c ccloader) readJS(base string, info *pkg.Info) error {
 		return err
 	}
 	if !existing {
-		return moddb.ErrNotFound
+		return pkg.ErrNotFound
 	}
 	file, err := os.Open(path)
 	if err != nil {
@@ -120,7 +119,7 @@ func (c ccloader) readJS(base string, info *pkg.Info) error {
 }
 
 func (c ccloader) Installed() bool {
-	base, err := c.base()
+	base, err := c.game.BasePath()
 	if err != nil {
 		return false
 	}
@@ -143,7 +142,7 @@ func (c ccloader) Install() error {
 		return pkg.NewErrorReason(pkg.ReasonNotFound, pkg.ModeInstall, c, nil)
 	}
 
-	base, err := c.base()
+	base, err := c.game.BasePath()
 	if err != nil {
 		return pkg.NewError(pkg.ModeInstall, c, err)
 	}
@@ -167,7 +166,7 @@ func (c ccloader) Install() error {
 }
 
 func (c ccloader) Uninstall() error {
-	base, err := c.base()
+	base, err := c.game.BasePath()
 	if err != nil {
 		return pkg.NewError(pkg.ModeUninstall, c, err)
 	}
@@ -224,12 +223,12 @@ func (c ccloader) Update() error {
 }
 
 func (c ccloader) Dependencies() ([]pkg.Package, error) {
-	base, err := c.base()
+	base, err := c.game.BasePath()
 	result := []pkg.Package{
 		mod.Mod{
 			Name: "Simplify",
 			Path: base,
-			Game: game.At(base),
+			Game: c.game,
 		},
 	}
 
@@ -240,23 +239,7 @@ func (c ccloader) Dependencies() ([]pkg.Package, error) {
 }
 
 func (c ccloader) NewestDependencies() ([]pkg.Package, error) {
-	base, err := c.base()
-	result := []pkg.Package{
-		mod.Mod{
-			Name: "Simplify",
-			Path: base,
-			Game: game.At(base),
-		},
-	}
-
-	if err != nil {
-		return result, pkg.NewError(pkg.ModeUnknown, c, err)
-	}
-	return result, nil
-}
-
-func (c ccloader) base() (string, error) {
-	return searchForGame(c.path)
+	return c.Dependencies()
 }
 
 func extract(reader *zip.Reader, dst, src string) (string, error) {
@@ -305,35 +288,6 @@ func extract(reader *zip.Reader, dst, src string) (string, error) {
 		}
 	}
 	return dst, nil
-}
-
-func searchForGame(dir string) (string, error) {
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		return "", err
-	}
-
-	if containsPackage(files) {
-		if exists, _ := exists(filepath.Join(dir, "./assets/node-webkit.html")); exists {
-			return dir, nil
-		}
-	}
-
-	parent := filepath.Dir(dir)
-	if parent == dir {
-		return "", moddb.ErrNotFound
-	}
-
-	return searchForGame(parent)
-}
-
-func containsPackage(files []os.FileInfo) bool {
-	for _, file := range files {
-		if !file.IsDir() && file.Name() == "package.json" {
-			return true
-		}
-	}
-	return false
 }
 
 func exists(path string) (bool, error) {

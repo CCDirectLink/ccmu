@@ -3,20 +3,14 @@ package mod
 import (
 	"path/filepath"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
 )
-
-//game is an interface to avoid cyclic imports with game.Game.
-type game interface {
-	Get(name string) (pkg.Package, error)
-	Installed() ([]pkg.Package, error)
-}
 
 //Mod package. Implements pkg.Package.
 type Mod struct {
 	Name string
 	Path string
-	Game game
+	Game game.Game
 
 	realPath string
 }

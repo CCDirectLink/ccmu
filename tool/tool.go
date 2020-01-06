@@ -3,20 +3,20 @@ package tool
 import (
 	"strings"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
+	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
 )
 
 //Available tools.
-func Available(path string) ([]pkg.Package, error) {
+func Available(game game.Game) ([]pkg.Package, error) {
 	return []pkg.Package{
-		ccloader{path},
+		ccloader{game},
 	}, nil
 }
 
 //Installed tools.
-func Installed(path string) ([]pkg.Package, error) {
-	avail, err := Available(path)
+func Installed(game game.Game) ([]pkg.Package, error) {
+	avail, err := Available(game)
 	result := make([]pkg.Package, 0, len(avail))
 
 	for _, tool := range avail {
@@ -29,11 +29,11 @@ func Installed(path string) ([]pkg.Package, error) {
 }
 
 //Get a tool by exact name.
-func Get(path, name string) (pkg.Package, error) {
+func Get(game game.Game, name string) (pkg.Package, error) {
 	switch strings.ToLower(name) {
 	case "ccloader":
-		return ccloader{path}, nil
+		return ccloader{game}, nil
 	default:
-		return nil, pkg.NewError(pkg.ModeUnknown, nil, moddb.ErrNotFound)
+		return nil, pkg.NewError(pkg.ModeUnknown, nil, pkg.ErrNotFound)
 	}
 }

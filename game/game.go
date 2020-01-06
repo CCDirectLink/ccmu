@@ -20,7 +20,8 @@ func At(path string) Game {
 	return Game{path}
 }
 
-func (g Game) path() (string, error) {
+//BasePath returns the resolved path of the game.
+func (g Game) BasePath() (string, error) {
 	if g.Path != "" {
 		return searchForGame(g.Path)
 	}
@@ -67,7 +68,7 @@ func (g Game) Available() ([]pkg.Package, error) {
 
 //Get mod by name.
 func (g Game) Get(name string) (pkg.Package, error) {
-	path, err := g.path()
+	path, err := g.BasePath()
 
 	result := mod.Mod{
 		Name: name,
