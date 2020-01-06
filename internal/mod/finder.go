@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
+	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
 )
 
 var errInvalidName = errors.New("mod: Invalid mod name")
@@ -40,7 +40,7 @@ func GetMods(path string, game game) ([]Mod, error) {
 func (m Mod) local() (string, error) {
 	mods := filepath.Join(m.Path, "assets", "mods")
 	if exists, _ := exists(mods); !exists {
-		return "", moddb.ErrNotFound
+		return "", pkg.ErrNotFound
 	}
 
 	unknown := filepath.Join(mods, m.Name)
@@ -61,7 +61,7 @@ func (m Mod) local() (string, error) {
 		}
 	}
 
-	return unknown, moddb.ErrNotFound
+	return unknown, pkg.ErrNotFound
 }
 
 func parseMod(path, gamePath string, game game) (Mod, error) {

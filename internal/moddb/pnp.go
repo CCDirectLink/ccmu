@@ -78,6 +78,7 @@ type PackageDBPackageMetadata struct {
 	Description       string                      `json:"description"`
 	Licence           string                      `json:"licence"`
 	Homepage          string                      `json:"homepage"`
+	Hidden            bool                        `json:"hidden"`
 }
 
 func (meta PackageDBPackageMetadata) niceName() string {

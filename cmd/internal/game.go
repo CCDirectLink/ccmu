@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
-	ccmu "github.com/CCDirectLink/CCUpdaterCLI"
+	"github.com/CCDirectLink/CCUpdaterCLI/game"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
 )
 
-func getGame() ccmu.Game {
-	return ccmu.At(flag.Lookup("game").Value.String())
+func getGame() game.Game {
+	return game.At(flag.Lookup("game").Value.String())
 }
 
 func getAll(names []string) []pkg.Package {

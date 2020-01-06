@@ -16,7 +16,11 @@ func List() {
 	for _, pkg := range pkgs {
 		info, err := pkg.Info()
 		if err == nil {
-			fmt.Printf("%s %s\n", info.NewestVersion, info.NiceName)
+			if info.Hidden {
+				fmt.Printf("%s %s [hidden]\n", info.NewestVersion, info.NiceName)
+			} else {
+				fmt.Printf("%s %s\n", info.NewestVersion, info.NiceName)
+			}
 		} else {
 			fmt.Println(err)
 		}

@@ -1,7 +1,6 @@
 package moddb
 
 import (
-	"errors"
 	"bytes"
 	"io"
 	"net/http"
@@ -15,9 +14,6 @@ var (
 
 	infos       map[string]pkg.Info
 	infosParsed bool
-
-	//ErrNotFound is returned when the given mod is not found.
-	ErrNotFound = errors.New("moddb: Mod not found")
 )
 
 //PkgInfo reads a given pkg.Info from the moddb.
@@ -31,7 +27,7 @@ func PkgInfo(name string) (pkg.Info, error) {
 
 	result, ok := infos[name]
 	if !ok {
-		return result, ErrNotFound
+		return result, pkg.ErrNotFound
 	}
 	return result, nil
 }
@@ -63,6 +59,7 @@ func PkgInfos() ([]pkg.Info, error) {
 			Description:   p.Metadata.Description,
 			Licence:       p.Metadata.Licence,
 			NewestVersion: string(p.Metadata.Version),
+			Hidden:        p.Metadata.Hidden,
 		}
 		cache[name] = result[i]
 		i++
@@ -85,6 +82,7 @@ func MergePkgInfo(info *pkg.Info) error {
 	info.Description = newInfo.Description
 	info.Licence = newInfo.Licence
 	info.NewestVersion = newInfo.NewestVersion
+	info.Hidden = newInfo.Hidden
 
 	return nil
 }
@@ -113,6 +111,16 @@ func DownloadMod(name string) (bytes.Buffer, string, error) {
 	return result, data.Source, err
 }
 
+//Dependencies of a package.
+func Dependencies(name string) (map[string]string, error) {
+	pkg, err := packageByName(name)
+	result := make(map[string]string, len(pkg.Metadata.CCModDependencies))
+	for k, v := range pkg.Metadata.CCModDependencies {
+		result[k] = string(v)
+	}
+	return result, err
+}
+
 func packageDB() (PackageDB, error) {
 	if pkgsDownloaded {
 		return pkgs, nil
@@ -134,9 +142,9 @@ func packageByName(name string) (PackageDBPackage, error) {
 		return PackageDBPackage{}, err
 	}
 
-	pkg, ok := pkgDB[name]
+	p, ok := pkgDB[name]
 	if !ok {
-		return pkg, ErrNotFound
+		return p, pkg.ErrNotFound
 	}
-	return pkg, nil
+	return p, nil
 }

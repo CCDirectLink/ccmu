@@ -2,14 +2,17 @@ package tool
 
 import (
 	"archive/zip"
+	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	ccmu "github.com/CCDirectLink/CCUpdaterCLI"
+	"github.com/CCDirectLink/CCUpdaterCLI/game"
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/mod"
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
@@ -20,7 +23,100 @@ type ccloader struct {
 }
 
 func (c ccloader) Info() (pkg.Info, error) {
-	return moddb.PkgInfo("ccloader") //TODO: add local info
+	info, errOnline := moddb.PkgInfo("ccloader")
+	path, err := c.base()
+	if err != nil {
+		return info, pkg.NewError(pkg.ModeUnknown, c, err)
+	}
+
+	ppath := filepath.Join(path, "ccloader", "package.json")
+	existing, err := exists(ppath)
+	if err != nil {
+		return info, pkg.NewError(pkg.ModeUnknown, c, err)
+	}
+
+	if existing {
+		err = c.readPackage(ppath, &info)
+	} else {
+		err = c.readJS(path, &info)
+	}
+	if err != nil {
+		return info, pkg.NewError(pkg.ModeUnknown, c, err)
+	}
+
+	if errOnline != nil {
+		return info, pkg.NewError(pkg.ModeUnknown, c, errOnline)
+	}
+	return info, nil
+}
+
+func (c ccloader) readPackage(path string, info *pkg.Info) error {
+	var data moddb.PackageDBPackageMetadata
+
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	err = json.NewDecoder(file).Decode(&data)
+	if info.Name == "" {
+		info.Name = data.Name
+	}
+	if info.NiceName == "" {
+		info.NiceName = data.CCModHumanName
+	}
+	if info.Description == "" {
+		info.Description = data.Description
+	}
+	if info.Licence == "" {
+		info.Licence = data.Licence
+	}
+	info.CurrentVersion = string(data.Version)
+
+	return err
+}
+
+func (c ccloader) readJS(base string, info *pkg.Info) error {
+	if info.Name == "" {
+		info.Name = "ccloader"
+	}
+	if info.NiceName == "" {
+		info.NiceName = "CCLoader"
+	}
+	if info.Description == "" {
+		info.Description = "Modloader for CrossCode. This or a similar modloader is needed for most mods."
+	}
+
+	path := filepath.Join(base, "ccloader", "js", "ccloader")
+	existing, err := exists(path)
+	if err != nil {
+		return err
+	}
+	if !existing {
+		return moddb.ErrNotFound
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	defer reader.Reset(nil)
+	reader.ReadSlice('=')
+	reader.ReadSlice('\'')
+	res, err := reader.ReadString('\'')
+	if err != nil {
+		return err
+	}
+
+	if len(res) > 0 {
+		res = res[:len(res)-1]
+	}
+	info.CurrentVersion = res
+
+	return nil
 }
 
 func (c ccloader) Installed() bool {
@@ -133,7 +229,23 @@ func (c ccloader) Dependencies() ([]pkg.Package, error) {
 		mod.Mod{
 			Name: "Simplify",
 			Path: base,
-			Game: ccmu.At(base),
+			Game: game.At(base),
+		},
+	}
+
+	if err != nil {
+		return result, pkg.NewError(pkg.ModeUnknown, c, err)
+	}
+	return result, nil
+}
+
+func (c ccloader) NewestDependencies() ([]pkg.Package, error) {
+	base, err := c.base()
+	result := []pkg.Package{
+		mod.Mod{
+			Name: "Simplify",
+			Path: base,
+			Game: game.At(base),
 		},
 	}
 
@@ -144,7 +256,7 @@ func (c ccloader) Dependencies() ([]pkg.Package, error) {
 }
 
 func (c ccloader) base() (string, error) {
-	return c.path, nil //TODO: Implement
+	return searchForGame(c.path)
 }
 
 func extract(reader *zip.Reader, dst, src string) (string, error) {
@@ -193,4 +305,45 @@ func extract(reader *zip.Reader, dst, src string) (string, error) {
 		}
 	}
 	return dst, nil
+}
+
+func searchForGame(dir string) (string, error) {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return "", err
+	}
+
+	if containsPackage(files) {
+		if exists, _ := exists(filepath.Join(dir, "./assets/node-webkit.html")); exists {
+			return dir, nil
+		}
+	}
+
+	parent := filepath.Dir(dir)
+	if parent == dir {
+		return "", moddb.ErrNotFound
+	}
+
+	return searchForGame(parent)
+}
+
+func containsPackage(files []os.FileInfo) bool {
+	for _, file := range files {
+		if !file.IsDir() && file.Name() == "package.json" {
+			return true
+		}
+	}
+	return false
+}
+
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+
+	if !os.IsNotExist(err) {
+		return true, err
+	}
+	return false, nil
 }

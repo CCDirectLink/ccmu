@@ -11,4 +11,5 @@ type Package interface {
 	Update() error
 
 	Dependencies() ([]Package, error)
+	NewestDependencies() ([]Package, error)
 }

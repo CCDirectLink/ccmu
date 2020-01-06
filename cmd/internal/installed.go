@@ -20,7 +20,11 @@ func Installed() {
 			if version == "" {
 				version = "x.x.x"
 			}
-			fmt.Printf("%s %s\n", version, info.NiceName)
+			if info.Hidden {
+				fmt.Printf("%s %s [hidden]\n", version, info.NiceName)
+			} else {
+				fmt.Printf("%s %s\n", version, info.NiceName)
+			}
 		} else {
 			fmt.Println(err)
 		}

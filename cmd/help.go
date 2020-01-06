@@ -13,6 +13,7 @@ func printHelp() {
 	fmt.Println("  uninstall <mod name>  Uninstall one or more mods")
 	fmt.Println("  update [mod name]     Updates one or more mods")
 	fmt.Println("  list                  Lists all mods that the tool knows about")
+	fmt.Println("  installed             Lists all installed mods")
 	fmt.Println("  outdated              Show the names and versions of outdated mods")
 	fmt.Println("  version               Display the version of this tool")
 	fmt.Println("  help                  Display this message")

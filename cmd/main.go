@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	flag.Usage = printHelp
 	flag.String("game", "", "if set it overrides the path of the game")
 	flag.Parse()
 

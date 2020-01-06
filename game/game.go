@@ -1,4 +1,4 @@
-package ccmu
+package game
 
 import (
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/mod"
@@ -22,7 +22,7 @@ func At(path string) Game {
 
 func (g Game) path() (string, error) {
 	if g.Path != "" {
-		return g.Path, nil
+		return searchForGame(g.Path)
 	}
 	return getGame()
 }

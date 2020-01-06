@@ -41,7 +41,8 @@ type Error struct {
 	Err    error
 }
 
-//TODO: Add `Cause Package`
+//ErrNotFound is returned when the given package is not found.
+var ErrNotFound = errors.New("pkg: Mod not found")
 
 //NewError with given mode and package.
 func NewError(mode Mode, pkg Package, err error) Error {

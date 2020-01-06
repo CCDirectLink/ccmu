@@ -10,9 +10,9 @@ func (m Mod) Info() (pkg.Info, error) {
 	if !m.Installed() {
 		if !m.Available() {
 			return pkg.Info{
-				Name: m.Name,
+				Name:     m.Name,
 				NiceName: m.Name,
-			}, moddb.ErrNotFound
+			}, pkg.ErrNotFound
 		}
 
 		return moddb.PkgInfo(m.Name)
@@ -35,5 +35,6 @@ func (m Mod) localInfo() pkg.Info {
 		Description:    data.Description,
 		Licence:        data.Licence,
 		CurrentVersion: data.Version,
+		Hidden:         data.Hidden,
 	}
 }

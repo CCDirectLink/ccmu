@@ -10,6 +10,7 @@ type Info struct {
 	Licence        string
 	CurrentVersion string
 	NewestVersion  string
+	Hidden         bool
 }
 
 //Outdated checks if an newer version is available

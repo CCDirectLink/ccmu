@@ -14,6 +14,7 @@ type Package struct {
 	Version      string            `json:"version"`
 	Licence      string            `json:"licence"`
 	Dependencies map[string]string `json:"ccmodDependecies"`
+	Hidden       bool              `json:"hidden"`
 }
 
 func readPackage(reader io.Reader) (Package, error) {

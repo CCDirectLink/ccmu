@@ -1,11 +1,17 @@
 package mod
 
-import "github.com/CCDirectLink/CCUpdaterCLI/pkg"
+import (
+	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
+	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+)
 
-//Dependencies of a mod including indirect ones.
-func (m Mod) Dependencies() ([]pkg.Package, error) {
+//NewestDependencies of a mod including indirect ones.
+func (m Mod) NewestDependencies() ([]pkg.Package, error) {
 	all, err := m.allDeps()
+	return removeDuplicates(all), err
+}
 
+func removeDuplicates(all []pkg.Package) []pkg.Package {
 	var result []pkg.Package
 	for _, pkg := range all {
 		pkgInfo, _ := pkg.Info()
@@ -23,19 +29,14 @@ func (m Mod) Dependencies() ([]pkg.Package, error) {
 			result = append(result, pkg)
 		}
 	}
-
-	return result, err
+	return result
 }
 
-func (m Mod) directDeps() ([]pkg.Package, error) {
-	data, err := m.readPackageFile()
-	if err != nil {
-		return []pkg.Package{}, err
-	}
-
-	var result = make([]pkg.Package, len(data.Dependencies))
-	var i = 0
-	for name := range data.Dependencies {
+func (m Mod) mapDeps(data map[string]string) ([]pkg.Package, error) {
+	var err error
+	result := make([]pkg.Package, len(data))
+	i := 0
+	for name := range data {
 		result[i], err = m.Game.Get(name)
 		if err != nil {
 			return result, err
@@ -46,6 +47,14 @@ func (m Mod) directDeps() ([]pkg.Package, error) {
 	return result, nil
 }
 
+func (m Mod) directDeps() ([]pkg.Package, error) {
+	data, err := moddb.Dependencies(m.Name)
+	if err != nil {
+		return []pkg.Package{}, err
+	}
+	return m.mapDeps(data)
+}
+
 func (m Mod) allDeps() ([]pkg.Package, error) {
 	var result []pkg.Package
 
@@ -54,13 +63,15 @@ func (m Mod) allDeps() ([]pkg.Package, error) {
 		return direct, err
 	}
 
+	result = append(result, direct...)
+
 	for _, pkg := range direct {
-		indirect, err := pkg.Dependencies()
+		indirect, err := pkg.NewestDependencies()
 		if err != nil {
 			return result, err
 		}
 
-		result = append(append(result, pkg), indirect...)
+		result = append(result, indirect...)
 	}
 
 	return result, nil
