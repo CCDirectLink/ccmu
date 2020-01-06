@@ -20,6 +20,7 @@ const (
 	ReasonInvalidFormat
 	ReasonNotFound
 	ReasonAccess
+	ReasonDependant
 )
 
 //Mode of the installation.
@@ -88,6 +89,8 @@ func (p Error) String() string {
 		return prefix + "the access was denied"
 	case ReasonInvalidFormat:
 		return prefix + "the mod was malformated"
+	case ReasonDependant:
+		return prefix + "there is a mod that depends on it"
 	case ReasonUnknown:
 		fallthrough
 	default:

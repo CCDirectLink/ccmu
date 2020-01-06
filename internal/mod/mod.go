@@ -6,9 +6,10 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
 )
 
-//game is an interface to avoid cyclic imports with ccmu.Game.
+//game is an interface to avoid cyclic imports with game.Game.
 type game interface {
 	Get(name string) (pkg.Package, error)
+	Installed() ([]pkg.Package, error)
 }
 
 //Mod package. Implements pkg.Package.
