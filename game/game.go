@@ -4,6 +4,7 @@ import (
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/mod"
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/CCUpdaterCLI/tool"
 	"strings"
 )
 
@@ -52,15 +53,23 @@ func (g Game) Available() ([]pkg.Package, error) {
 
 	result := make([]pkg.Package, 0, len(infos))
 	for _, info := range infos {
-		if info.NiceName == "CCLoader" {
-			continue
+		var p pkg.Package
+
+		switch strings.ToLower(info.NiceName) {
+		case "ccloader":
+			p, err = tool.Get(g, "ccloader")
+			if err != nil {
+				return nil, err
+			}
+		default:
+			p = mod.Mod{
+				Name: info.Name,
+				Path: g.Path,
+				Game: &g,
+			}
 		}
 
-		result = append(result, mod.Mod{
-			Name: info.Name,
-			Path: g.Path,
-			Game: &g,
-		})
+		result = append(result, p)
 	}
 
 	return result, nil
@@ -68,6 +77,11 @@ func (g Game) Available() ([]pkg.Package, error) {
 
 //Get mod by name.
 func (g Game) Get(name string) (pkg.Package, error) {
+	switch strings.ToLower(name) {
+	case "ccloader":
+		return tool.Get(g, "ccloader")
+	}
+
 	path, err := g.BasePath()
 
 	result := mod.Mod{
