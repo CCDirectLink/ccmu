@@ -2,8 +2,8 @@ package tool
 
 import (
 	"encoding/json"
-	"path/filepath"
 	"os"
+	"path/filepath"
 
 	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
 	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
@@ -32,7 +32,7 @@ func (c crosscode) Info() (pkg.Info, error) {
 
 func (c crosscode) Installed() bool {
 	_, err := c.game.BasePath()
-	return err != nil
+	return err == nil
 }
 
 func (c crosscode) Available() bool {
