@@ -13,7 +13,7 @@ type Package struct {
 	Description  string            `json:"description"`
 	Version      string            `json:"version"`
 	Licence      string            `json:"licence"`
-	Dependencies map[string]string `json:"ccmodDependecies"`
+	Dependencies map[string]string `json:"ccmodDependencies"`
 	Hidden       bool              `json:"hidden"`
 }
 
@@ -27,7 +27,7 @@ func (m Mod) readPackageFile() (Package, error) {
 	path := filepath.Join(m.path(), "package.json")
 	file, err := os.Open(path)
 	if err != nil {
-		return Package{}, nil
+		return Package{}, err
 	}
 	defer file.Close()
 
