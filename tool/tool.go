@@ -25,6 +25,10 @@ func Installed(game game.Game) ([]pkg.Package, error) {
 		}
 	}
 
+	if (crosscode{game}).Installed() {
+		result = append(result, crosscode{game})
+	}
+
 	return result, err
 }
 
@@ -33,6 +37,8 @@ func Get(game game.Game, name string) (pkg.Package, error) {
 	switch strings.ToLower(name) {
 	case "ccloader":
 		return ccloader{game}, nil
+	case "crosscode":
+		return crosscode{game}, nil
 	default:
 		return nil, pkg.NewError(pkg.ModeUnknown, nil, pkg.ErrNotFound)
 	}
