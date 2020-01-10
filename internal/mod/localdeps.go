@@ -20,7 +20,7 @@ func (m Mod) directLocalDeps() ([]pkg.Package, error) {
 func (m Mod) allLocalDeps() ([]pkg.Package, error) {
 	var result []pkg.Package
 
-	direct, err := m.directDeps()
+	direct, err := m.directLocalDeps()
 	if err != nil {
 		return direct, err
 	}
