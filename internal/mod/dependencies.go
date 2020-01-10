@@ -14,6 +14,10 @@ func (m Mod) NewestDependencies() ([]pkg.Package, error) {
 func removeDuplicates(all []pkg.Package) []pkg.Package {
 	var result []pkg.Package
 	for _, pkg := range all {
+		if pkg == nil {
+			continue
+		}
+
 		pkgInfo, _ := pkg.Info()
 
 		duplicate := false
@@ -33,15 +37,13 @@ func removeDuplicates(all []pkg.Package) []pkg.Package {
 }
 
 func (m Mod) mapDeps(data map[string]string) ([]pkg.Package, error) {
-	var err error
-	result := make([]pkg.Package, len(data))
-	i := 0
+	result := make([]pkg.Package, 0, len(data))
 	for name := range data {
-		result[i], err = m.Game.Get(name)
+		p, err := m.Game.Get(name)
 		if err != nil {
 			return result, err
 		}
-		i++
+		result = append(result, p)
 	}
 
 	return result, nil
