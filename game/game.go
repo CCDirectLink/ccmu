@@ -95,6 +95,11 @@ func (g Game) Get(name string) (pkg.Package, error) {
 	if err != nil {
 		return result, pkg.NewError(pkg.ModeUnknown, result, err)
 	}
+
+	if !result.Installed() && !result.Available() {
+		return result, pkg.NewError(pkg.ModeUnknown, result, pkg.ErrNotFound)
+	}
+
 	return result, nil
 }
 
