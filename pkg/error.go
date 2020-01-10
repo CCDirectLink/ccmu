@@ -78,8 +78,13 @@ func (p Error) Unwrap() error {
 }
 
 func (p Error) String() string {
-	info, _ := p.Pkg.Info()
-	prefix := fmt.Sprintf("Could not %s %s because ", p.Mode, info.NiceName)
+	var prefix string
+	if p.Pkg != nil {
+		info, _ := p.Pkg.Info()
+		prefix = fmt.Sprintf("Could not %s %s because ", p.Mode, info.NiceName)
+	} else {
+		prefix = fmt.Sprintf("Could not %s mod because ", p.Mode)
+	}
 
 	switch p.Reason {
 	case ReasonNotFound:
