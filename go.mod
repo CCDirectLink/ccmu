@@ -1,4 +1,4 @@
-module github.com/CCDirectLink/CCUpdaterCLI
+module github.com/CCDirectLink/ccmu
 
 go 1.12
 
