@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/game"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/game"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 func getGame() game.Game {

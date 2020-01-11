@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/game"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/game"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 func main() {

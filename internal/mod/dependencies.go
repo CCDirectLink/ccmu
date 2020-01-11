@@ -1,8 +1,8 @@
 package mod
 
 import (
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/internal/moddb"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 //NewestDependencies of a mod including indirect ones.

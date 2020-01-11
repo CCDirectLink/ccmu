@@ -1,6 +1,6 @@
 package mod
 
-import "github.com/CCDirectLink/CCUpdaterCLI/pkg"
+import "github.com/CCDirectLink/ccmu/pkg"
 
 //Update a mod if it's outdated.
 func (m Mod) Update() error {

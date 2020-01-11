@@ -3,8 +3,8 @@ package tool
 import (
 	"strings"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/internal/game"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 //Available tools.

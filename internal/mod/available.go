@@ -1,6 +1,6 @@
 package mod
 
-import "github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
+import "github.com/CCDirectLink/ccmu/internal/moddb"
 
 //Available checks if it can be installed.
 func (m Mod) Available() bool {

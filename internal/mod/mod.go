@@ -3,7 +3,7 @@ package mod
 import (
 	"path/filepath"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
+	"github.com/CCDirectLink/ccmu/internal/game"
 )
 
 //Mod package. Implements pkg.Package.

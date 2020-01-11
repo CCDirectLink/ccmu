@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/internal/game"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 var errInvalidName = errors.New("mod: Invalid mod name")

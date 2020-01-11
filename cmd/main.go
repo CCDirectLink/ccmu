@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/cmd/internal"
+	"github.com/CCDirectLink/ccmu/cmd/internal"
 )
 
 func main() {

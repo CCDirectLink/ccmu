@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/internal/moddb"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 //Install the mod

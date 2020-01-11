@@ -11,10 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/mod"
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/moddb"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/internal/game"
+	"github.com/CCDirectLink/ccmu/internal/mod"
+	"github.com/CCDirectLink/ccmu/internal/moddb"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 type ccloader struct {

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/internal/game"
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/internal/game"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 type crosscode struct {

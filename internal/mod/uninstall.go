@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 //Uninstall the mod.

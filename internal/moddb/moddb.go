@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/CCDirectLink/CCUpdaterCLI/pkg"
+	"github.com/CCDirectLink/ccmu/pkg"
 )
 
 var (

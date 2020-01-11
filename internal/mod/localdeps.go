@@ -1,6 +1,6 @@
 package mod
 
-import "github.com/CCDirectLink/CCUpdaterCLI/pkg"
+import "github.com/CCDirectLink/ccmu/pkg"
 
 //Dependencies of a mod including indirect ones.
 func (m Mod) Dependencies() ([]pkg.Package, error) {
