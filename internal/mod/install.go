@@ -30,11 +30,8 @@ func (m Mod) Install() error {
 	}
 
 	for _, dep := range deps {
-		err = dep.Install()
-		var pkgErr pkg.Error
-		if errors.As(err, &pkgErr) && pkgErr.Reason != pkg.ReasonAlreadyInstalled {
-			return err
-		} else if err != nil {
+		err = m.installDep(dep)
+		if err != nil {
 			return err
 		}
 	}
@@ -54,6 +51,27 @@ func (m Mod) Install() error {
 		return pkg.NewError(pkg.ModeInstall, m, err)
 	}
 
+	return nil
+}
+
+func (m Mod) installDep(dep pkg.Package) error {
+	var err error
+	if !dep.Installed() {
+		err = dep.Install()
+	} else {
+		info, err := dep.Info()
+		if err == nil {
+			if outdated, _ := info.Outdated(); outdated {
+				err = dep.Update()
+			}
+		}
+	}
+	var pkgErr pkg.Error
+	if errors.As(err, &pkgErr) && pkgErr.Reason != pkg.ReasonAlreadyInstalled {
+		return err
+	} else if err != nil {
+		return err
+	}
 	return nil
 }
 
