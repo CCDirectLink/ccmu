@@ -14,18 +14,19 @@ type crosscode struct {
 }
 
 func (c crosscode) Info() (pkg.Info, error) {
-	version, err := c.readVersion()
 	result := pkg.Info{
 		Name:           "crosscode",
 		NiceName:       "CrossCode",
 		Description:    "The base version of CrossCode",
-		CurrentVersion: version,
-		NewestVersion:  version,
+		CurrentVersion: "0.0.0",
+		NewestVersion:  "0.0.0",
 		Hidden:         false,
 	}
 
-	if err != nil {
-		return result, pkg.NewError(pkg.ModeUnknown, c, err)
+	version, err := c.readVersion()
+	if err == nil {
+		result.CurrentVersion = version
+		result.NewestVersion = version
 	}
 	return result, nil
 }

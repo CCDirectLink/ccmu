@@ -25,7 +25,7 @@ func (c ccloader) Info() (pkg.Info, error) {
 	info, errOnline := moddb.PkgInfo("ccloader")
 	path, err := c.game.BasePath()
 	if err != nil {
-		return info, pkg.NewError(pkg.ModeUnknown, c, err)
+		return info, nil
 	}
 
 	ppath := filepath.Join(path, "ccloader", "package.json")
