@@ -9,6 +9,14 @@ import (
 
 //Available tools.
 func Available(game game.Game) ([]pkg.Package, error) {
+	url := browser{game}
+	if url.Available() {
+		return []pkg.Package{
+			ccloader{game},
+			url,
+		}, nil
+	}
+
 	return []pkg.Package{
 		ccloader{game},
 	}, nil
@@ -39,6 +47,8 @@ func Get(game game.Game, name string) (pkg.Package, error) {
 		return ccloader{game}, nil
 	case "crosscode":
 		return crosscode{game}, nil
+	case "browser":
+		return browser{game}, nil
 	default:
 		return nil, pkg.NewError(pkg.ModeUnknown, nil, pkg.ErrNotFound)
 	}

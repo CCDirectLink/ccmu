@@ -82,6 +82,8 @@ func (g Game) Get(name string) (pkg.Package, error) {
 		return tool.Get(g, "ccloader")
 	case "crosscode":
 		return tool.Get(g, "crosscode")
+	case "browser":
+		return tool.Get(g, "browser")
 	}
 
 	path, err := g.BasePath()
@@ -111,6 +113,11 @@ func (g Game) Find(name string) []pkg.Package {
 	exact := findExact(name, avail, inst)
 	if exact != nil {
 		return []pkg.Package{exact}
+	}
+
+	toolPkg, err := tool.Get(g, name)
+	if err == nil && toolPkg != nil {
+		return []pkg.Package{toolPkg}
 	}
 
 	return findAll(name, avail, inst)
