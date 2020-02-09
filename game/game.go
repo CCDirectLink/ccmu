@@ -1,11 +1,14 @@
 package game
 
 import (
+	"net/url"
+	"os"
+	"strings"
+
 	"github.com/CCDirectLink/ccmu/internal/mod"
 	"github.com/CCDirectLink/ccmu/internal/moddb"
 	"github.com/CCDirectLink/ccmu/pkg"
 	"github.com/CCDirectLink/ccmu/tool"
-	"strings"
 )
 
 //Game represents a game instance at a given path.
@@ -75,6 +78,15 @@ func (g Game) Available() ([]pkg.Package, error) {
 	return result, nil
 }
 
+//FromSource returns a mod that represents the source object
+func (g Game) FromSource(source string) (pkg.Package, error) {
+	result, err := mod.FromSource(source, g)
+	if err != nil {
+		return result, pkg.NewError(pkg.ModeUnknown, result, err)
+	}
+	return result, nil
+}
+
 //Get mod by name.
 func (g Game) Get(name string) (pkg.Package, error) {
 	switch strings.ToLower(name) {
@@ -110,6 +122,11 @@ func (g Game) Find(name string) []pkg.Package {
 	avail, _ := g.Available()
 	inst, _ := g.Installed()
 
+	src := g.findSource(name)
+	if src != nil {
+		return []pkg.Package{src}
+	}
+
 	exact := findExact(name, avail, inst)
 	if exact != nil {
 		return []pkg.Package{exact}
@@ -121,6 +138,36 @@ func (g Game) Find(name string) []pkg.Package {
 	}
 
 	return findAll(name, avail, inst)
+}
+
+func (g Game) findSource(name string) pkg.Package {
+	if ok, _ := isValidURL(name); ok {
+		result, err := mod.FromSource(name, g)
+		if err != nil {
+			return nil
+		}
+		return result
+	}
+
+	stat, err := os.Stat(name)
+	if err == nil && !stat.IsDir() {
+		result, err := mod.FromSource(name, g)
+		if err != nil {
+			return nil
+		}
+		return result
+	}
+	return nil
+}
+
+func isValidURL(toTest string) (bool, string) {
+	_, err := url.ParseRequestURI(toTest)
+	if err != nil {
+		return false, ""
+	}
+
+	u, err := url.Parse(toTest)
+	return err == nil && u.Scheme != "" && u.Host != "", u.Path
 }
 
 func findExact(name string, avail, inst []pkg.Package) pkg.Package {

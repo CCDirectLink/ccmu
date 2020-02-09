@@ -20,9 +20,8 @@ func (m Mod) Uninstall() error {
 		if errors.As(err, &pkgErr) {
 			pkgErr.Mode = pkg.ModeUninstall
 			return pkgErr
-		} else if err != nil {
-			return err
 		}
+		return err
 	}
 
 	for _, mod := range allMods {

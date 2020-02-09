@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"net/http"
 	"os"
+
+	"github.com/Masterminds/semver"
 )
 
 //ErrorReason that is included in Error.
@@ -50,7 +51,11 @@ var ErrNotFound = errors.New("pkg: Mod not found")
 func NewError(mode Mode, pkg Package, err error) Error {
 	var reason = ReasonUnknown
 
-	if _, ok := err.(*http.ProtocolError); ok {
+	var pkgError Error
+	if errors.As(err, &pkgError) && pkgError.Pkg != pkg {
+		pkgError.Mode = mode
+		return pkgError
+	} else if _, ok := err.(*http.ProtocolError); ok {
 		reason = ReasonNoInternet
 	} else if _, ok := err.(*json.SyntaxError); ok {
 		reason = ReasonInvalidFormat

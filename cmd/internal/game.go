@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/CCDirectLink/ccmu/game"
+	"github.com/CCDirectLink/ccmu/internal/mod"
 	"github.com/CCDirectLink/ccmu/pkg"
 )
 
@@ -34,19 +35,22 @@ func getAll(names []string) []pkg.Package {
 			}
 			fmt.Print("\n")
 		} else {
-			info, _ := matches[0].Info()
+			mod, ok := matches[0].(mod.Mod)
+			if !ok || mod.Source != name {
+				info, _ := matches[0].Info()
 
-			if strings.ToLower(info.Name) != strings.ToLower(name) && strings.ToLower(info.NiceName) != strings.ToLower(name) {
-				fmt.Printf("Entered '%s' but only found %s (%s).\n", name, info.NiceName, info.Name)
-				response := "invalid"
-				for len(response) != 0 && response[0] != 'y' && response[0] != 'Y' && response[0] != 'n' && response[0] != 'N' {
-					fmt.Printf("Pick %s instead [Y/n]? ", info.NiceName)
-					response, _ = reader.ReadString('\n')
-					response = strings.ReplaceAll(strings.ReplaceAll(response, "\r", ""), "\n", "")
-				}
+				if strings.ToLower(info.Name) != strings.ToLower(name) && strings.ToLower(info.NiceName) != strings.ToLower(name) {
+					fmt.Printf("Entered '%s' but only found %s (%s).\n", name, info.NiceName, info.Name)
+					response := "invalid"
+					for len(response) != 0 && response[0] != 'y' && response[0] != 'Y' && response[0] != 'n' && response[0] != 'N' {
+						fmt.Printf("Pick %s instead [Y/n]? ", info.NiceName)
+						response, _ = reader.ReadString('\n')
+						response = strings.ReplaceAll(strings.ReplaceAll(response, "\r", ""), "\n", "")
+					}
 
-				if len(response) != 0 && response[0] != 'y' && response[0] != 'Y' {
-					continue
+					if len(response) != 0 && response[0] != 'y' && response[0] != 'Y' {
+						continue
+					}
 				}
 			}
 

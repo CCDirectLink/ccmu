@@ -50,6 +50,14 @@ func (m Mod) mapDeps(data map[string]string) ([]pkg.Package, error) {
 }
 
 func (m Mod) directDeps() ([]pkg.Package, error) {
+	if m.Source != "" {
+		data, err := readPackageFromSource(m.Source)
+		if err != nil {
+			return []pkg.Package{}, err
+		}
+		return m.mapDeps(data.Dependencies)
+	}
+
 	data, err := moddb.Dependencies(m.Name)
 	if err != nil {
 		return []pkg.Package{}, err

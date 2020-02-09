@@ -147,7 +147,7 @@ func (c ccloader) Install() error {
 		return pkg.NewError(pkg.ModeInstall, c, err)
 	}
 
-	buf, src, err := moddb.DownloadMod("ccloader")
+	buf, src, err := moddb.DownloadMod("ccloader", false)
 	if err != nil {
 		return pkg.NewError(pkg.ModeInstall, c, err)
 	}

@@ -2,10 +2,16 @@ package moddb
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/CCDirectLink/ccmu/pkg"
+)
+
+var (
+	//ErrNoInstallMethods is returned when a mod has no known or valid installation methods
+	ErrNoInstallMethods = errors.New("moddb: No installation method available")
 )
 
 var (
@@ -88,19 +94,19 @@ func MergePkgInfo(info *pkg.Info) error {
 }
 
 //DownloadMod as io.ReadCloser.
-func DownloadMod(name string) (bytes.Buffer, string, error) {
+func DownloadMod(name string, preferPacked bool) (bytes.Buffer, string, error) {
 	p, err := packageByName(name)
 	if err != nil {
 		return bytes.Buffer{}, "", err
 	}
 
-	//TODO: iterate over installation method
-	data, err := p.Installation[0].modZip()
+	zip, packed, err := getInstallMethods(p)
 	if err != nil {
 		return bytes.Buffer{}, "", err
 	}
 
-	resp, err := http.Get(data.URL)
+	url, source := pickInstallMethods(preferPacked, zip, packed)
+	resp, err := http.Get(url)
 	if err != nil {
 		return bytes.Buffer{}, "", err
 	}
@@ -108,7 +114,52 @@ func DownloadMod(name string) (bytes.Buffer, string, error) {
 
 	var result bytes.Buffer
 	_, err = io.Copy(&result, resp.Body)
-	return result, data.Source, err
+	return result, source, err
+}
+
+func getInstallMethods(p PackageDBPackage) (PackageDBInstallationMethodModZip, PackageDBInstallationMethodCCMod, error) {
+	var (
+		zip    PackageDBInstallationMethodModZip
+		packed PackageDBInstallationMethodCCMod
+	)
+
+	for _, method := range p.Installation {
+		switch method.common().Type {
+		case PackageDBInstallationMethodTypeModZip:
+			zip, _ = method.modZip()
+		case PackageDBInstallationMethodTypeModCCMod:
+			packed, _ = method.ccmod()
+		}
+	}
+
+	if zip.Type == "" && packed.Type == "" {
+		return zip, packed, ErrNoInstallMethods
+	}
+	return zip, packed, nil
+}
+
+func pickInstallMethods(preferPacked bool, zip PackageDBInstallationMethodModZip, packed PackageDBInstallationMethodCCMod) (url string, source string) {
+	if preferPacked {
+		if packed.Type != "" {
+			//packed is availabe and preferred
+			url = packed.URL
+		} else {
+			//packed is not availabe but preferred -> pick zip anyway
+			url = zip.URL
+			source = zip.Source
+		}
+	} else {
+		if zip.Type != "" {
+			//zip is availabe and preferred
+			url = zip.URL
+			source = zip.Source
+		} else {
+			//zip is not availabe but preferred -> download ccmod and extract it
+			url = packed.URL
+			source = "/"
+		}
+	}
+	return url, source
 }
 
 //Dependencies of a package.

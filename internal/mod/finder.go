@@ -58,6 +58,13 @@ func (m Mod) local() (string, error) {
 			if mod.Name == m.Name {
 				return result, err
 			}
+		} else if filepath.Ext(dir.Name()) == ".ccmod" {
+			result := filepath.Join(mods, dir.Name())
+			pkg, _ := readPackageFromCCMod(result)
+
+			if pkg.Name == m.Name {
+				return result, nil
+			}
 		}
 	}
 
@@ -84,6 +91,7 @@ func parseMod(path, gamePath string, game game.Game) (Mod, error) {
 		data.Name,
 		gamePath,
 		game,
+		"",
 		"",
 	}, nil
 }

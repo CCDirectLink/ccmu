@@ -7,7 +7,8 @@ import (
 
 //Info about the mod.
 func (m Mod) Info() (pkg.Info, error) {
-	if !m.Installed() {
+
+	if !m.Installed() && m.Source == "" {
 		if !m.Available() {
 			return pkg.Info{
 				Name:     m.Name,
@@ -19,11 +20,21 @@ func (m Mod) Info() (pkg.Info, error) {
 	}
 
 	info := m.localInfo()
-
 	var err error
-	if m.Available() {
+	if m.Available() && m.Source == "" {
 		err = moddb.MergePkgInfo(&info)
 	}
+
+	if m.Source != "" {
+		data, _ := readPackageFromSource(m.Source)
+		info.Name = data.Name
+		info.NiceName = data.Name
+		info.Description = data.Description
+		info.Licence = data.Licence
+		info.NewestVersion = data.Version
+		info.Hidden = data.Hidden
+	}
+
 	return info, err
 }
 

@@ -102,6 +102,7 @@ var ErrWrongInstallationMethod = errors.New("moddb: Wrong installation method")
 type PackageDBInstallationMethod struct {
 	PackageDBInstallationMethodCommon
 	PackageDBInstallationMethodModZip
+	PackageDBInstallationMethodCCMod
 }
 
 //common struct to all installation methods.
@@ -113,10 +114,21 @@ func (m PackageDBInstallationMethod) common() PackageDBInstallationMethodCommon 
 func (m PackageDBInstallationMethod) modZip() (PackageDBInstallationMethodModZip, error) {
 	common := m.common()
 	m.PackageDBInstallationMethodModZip.PackageDBInstallationMethodCommon = common
+	m.PackageDBInstallationMethodModZip.PackageDBInstallationMethodCCMod = m.PackageDBInstallationMethodCCMod
 	if common.Type != PackageDBInstallationMethodTypeModZip {
 		return m.PackageDBInstallationMethodModZip, ErrWrongInstallationMethod
 	}
 	return m.PackageDBInstallationMethodModZip, nil
+}
+
+//modZip struct. Returns error if type is wrong.
+func (m PackageDBInstallationMethod) ccmod() (PackageDBInstallationMethodCCMod, error) {
+	common := m.common()
+	m.PackageDBInstallationMethodCCMod.PackageDBInstallationMethodCommon = common
+	if common.Type != PackageDBInstallationMethodTypeModZip {
+		return m.PackageDBInstallationMethodCCMod, ErrWrongInstallationMethod
+	}
+	return m.PackageDBInstallationMethodCCMod, nil
 }
 
 //PackageDBInstallationMethodType represents the possible types of a PackageDBInstallationMethod
@@ -124,7 +136,8 @@ type PackageDBInstallationMethodType string
 
 //Possible values for PackageDBInstallationMethodType
 const (
-	PackageDBInstallationMethodTypeModZip = "modZip"
+	PackageDBInstallationMethodTypeModZip   = "modZip"
+	PackageDBInstallationMethodTypeModCCMod = "ccmod"
 )
 
 //PackageDBInstallationMethodCommon contains common fields between all PackageDBInstallationMethods.
@@ -135,11 +148,16 @@ type PackageDBInstallationMethodCommon struct {
 
 //PackageDBInstallationMethodModZip contains the data required for modzip installation
 type PackageDBInstallationMethodModZip struct {
+	PackageDBInstallationMethodCCMod
+	Source string `json:"source"`
+}
+
+//PackageDBInstallationMethodCCMod contains the data required for packed mod installation
+type PackageDBInstallationMethodCCMod struct {
 	PackageDBInstallationMethodCommon
 
-	URL    string        `json:"url"`
-	Hash   PackageDBHash `json:"hash"`
-	Source string        `json:"source"`
+	URL  string        `json:"url"`
+	Hash PackageDBHash `json:"hash"`
 }
 
 //PackageDBPackage represents a package in the database.

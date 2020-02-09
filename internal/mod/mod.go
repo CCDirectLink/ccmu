@@ -8,11 +8,25 @@ import (
 
 //Mod package. Implements pkg.Package.
 type Mod struct {
-	Name string
-	Path string
-	Game game.Game
+	Name   string
+	Path   string
+	Game   game.Game
+	Source string
 
 	realPath string
+}
+
+//FromSource creates a mod that installed from the specified source.
+func FromSource(source string, game game.Game) (Mod, error) {
+	basePath, _ := game.BasePath()
+	pkg, err := readPackageFromSource(source)
+
+	return Mod{
+		Name:   pkg.Name,
+		Source: source,
+		Game:   game,
+		Path:   basePath,
+	}, err
 }
 
 func (m Mod) path() string {
