@@ -2,8 +2,9 @@ package registry
 
 import (
 	"fmt"
-	"golang.org/x/sys/windows/registry"
 	"strings"
+
+	"golang.org/x/sys/windows/registry"
 )
 
 //Supported shows if registry is supported or not.
@@ -11,9 +12,12 @@ const Supported = true
 
 //RegisterProtocol in HKEY_CLASSES_ROOT.
 func RegisterProtocol(ccmu, game string) error {
-	elevate()
+	software, _ := registry.OpenKey(registry.CURRENT_USER, "Software", registry.READ|registry.WRITE)
+	defer software.Close()
+	classes, _ := registry.OpenKey(software, "Classes", registry.READ|registry.WRITE)
+	defer software.Close()
 
-	root, _, err := registry.CreateKey(registry.CLASSES_ROOT, "ccmu", registry.READ|registry.WRITE)
+	root, _, err := registry.CreateKey(classes, "ccmu", registry.READ|registry.WRITE)
 	if err != nil {
 		return err
 	}
@@ -33,16 +37,21 @@ func RegisterProtocol(ccmu, game string) error {
 
 //UnregisterProtocol from HKEY_CLASSES_ROOT.
 func UnregisterProtocol() error {
-	elevate()
-
-	return registry.DeleteKey(registry.CLASSES_ROOT, "ccmu")
+	software, _ := registry.OpenKey(registry.CURRENT_USER, "Software", registry.WRITE)
+	defer software.Close()
+	classes, _ := registry.OpenKey(software, "Classes", registry.WRITE)
+	defer software.Close()
+	return registry.DeleteKey(classes, "ccmu")
 }
 
 //ProtocolInstalled in HKEY_CLASSES_ROOT.
 func ProtocolInstalled() string {
-	elevate()
+	software, _ := registry.OpenKey(registry.CURRENT_USER, "Software", registry.WRITE)
+	defer software.Close()
+	classes, _ := registry.OpenKey(software, "Classes", registry.WRITE)
+	defer software.Close()
 
-	root, err := registry.OpenKey(registry.CLASSES_ROOT, "ccmu", registry.READ)
+	root, err := registry.OpenKey(classes, "ccmu", registry.READ)
 	defer root.Close()
 	if err != nil {
 		return ""

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 
@@ -10,10 +11,11 @@ import (
 )
 
 func main() {
+	var err error
 
 	flag.Usage = printHelp
 	flag.String("game", "", "if set it overrides the path of the game")
-	url := flag.String("url", "", "the url that executed ccmu")
+	uri := flag.String("url", "", "the url that executed ccmu")
 	flag.Parse()
 
 	if len(os.Args) == 1 {
@@ -24,9 +26,16 @@ func main() {
 	op := flag.Arg(0)
 	args := flag.Args()[1:]
 
-	if url != nil && *url != "" {
-		raw := *url
-		args = strings.Split(raw[7:len(raw)-1], " ")
+	if uri != nil && *uri != "" {
+		raw := *uri
+		args = strings.Split(raw[7:len(raw)-1], "/")
+		for i, arg := range args {
+			args[i], err = url.PathUnescape(arg)
+			if err != nil {
+				fmt.Printf("An error occured in %s\n", err)
+				os.Exit(1)
+			}
+		}
 	}
 
 	switch op {
